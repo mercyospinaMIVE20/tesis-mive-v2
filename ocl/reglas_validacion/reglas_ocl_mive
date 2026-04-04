@@ -1,0 +1,228 @@
+/**
+ * METAMODELO MIVE v2.0 - REGLAS DE NEGOCIO OCL
+ * Tesis Doctoral: Ontología y Reglas OCL Metamodelo MIVE 2.0
+ * 
+ * Este archivo contiene las 29 reglas de integridad que gobiernan el sistema EBCT-EDA.
+ * Aseguran que el avance sea balanceado, ético y soberano.
+ */
+
+-- ============================================================================
+-- 5.3.1. Validación de Madurez y Tracción pre-técnica
+-- ============================================================================
+
+context PuntoDecision
+inv R1_ValidacionTraccion:
+    -- Prohíbe el código hasta que la tracción manual sea validada
+    self.etapaActual = EtapaPSD::PROTOTIPO_LAB implies 
+    (self.crl.validacionManualCompletada = true and 
+     self.mvp_cero.evidenciaTraccion->notEmpty())
+
+context PuntoDecision
+inv R2_VerificarBrecha:
+    -- Permite asimetría de hasta 3 niveles (Impacto) y 2 niveles (Técnico/Comercial)
+    (self.trl.nivel - self.crl.nivel).abs() <= 2 and 
+    (self.trl.nivel - self.ipl.nivel).abs() <= 3 and 
+    (self.crl.nivel - self.ipl.nivel).abs() <= 3
+
+context PuntoDecision
+inv R11_Effectuation:
+    -- El MVP inicial debe ejecutarse con los recursos a la mano
+    self.mvp_cero.costoEjecucion <= self.factoresContexto.presupuestoDisponible
+
+context CRL
+inv R16a_MadurezComercial:
+    -- Solo hay madurez si se cumple el KPI de tracción
+    self.nivel >= 5 implies 
+    self.metricaTraccion >= 0.5 -- Asumiendo umbral genérico si no hay objeto metricaClave directo
+
+context IPL
+inv R16b_MadurezImpacto:
+    -- Requiere verificación externa y cumplimiento de metas sociales
+    self.nivel >= 5 implies 
+    (self.metricasImpacto->forAll(m | m.valorObtenido >= m.valorObjetivo))
+
+-- ============================================================================
+-- 5.3.2. Bifurcación EDA: Trayectoria Inteligente y Exclusividad
+-- ============================================================================
+
+context FactoresContexto
+inv R3_CaminosAceleracion:
+    -- Vibe-Coding activado por complejidad, estrategia o urgencia
+    (self.complejidadAlgoritmica > 0.7 and self.equipoEmprendedor.miembros->exists(m | m.criterioTecnico >= 7)) or 
+    (self.esTripleImpacto = true and self.requiereSoberaniaTotal = true) or 
+    (self.tiempoLimite <= 2) 
+    implies 
+    self.evaluarMejorRuta() = TipoTrayectoria::TRAYECTORIA_VIBE_CODING
+
+context FactoresContexto
+inv R4_TrayectoriaLowCode:
+    -- Obliga a eficiencia extrema en presupuestos mínimos (< 100 unidades)
+    self.presupuestoDisponible < 100 implies 
+    self.evaluarMejorRuta() = TipoTrayectoria::TRAYECTORIA_LOW_CODE
+
+context PuntoDecision
+inv R12_ExclusividadTrayectoria:
+    -- Impide la duplicidad de recursos; una trayectoria excluye a la otra
+    -- Nota: Asume atributos derivados o estado activo en los entornos
+    (self.entornoLowCode->notEmpty() and self.agenteVibeCoding->notEmpty()) implies 
+    (self.entornoLowCode.active xor self.agenteVibeCoding.active)
+
+-- ============================================================================
+-- 5.3.3. Soberanía, Integridad de IA y Validación Legal
+-- ============================================================================
+
+context Agente_VibeCoding
+inv R5_CertificacionSoberania:
+    -- El producto real debe ser propiedad intelectual del equipo
+    self.esProductoReal = true implies 
+    self.soberaniaCodigo = true
+
+context TRL
+inv R6_ObligatoriedadAuditoria:
+    -- Si es IA, obliga auditoría con explicabilidad >= 0.8
+    self.esGeneradoPorIA = true implies 
+    (self.auditoriaIA->notEmpty() and self.auditoriaIA.nivelExplicabilidad >= 0.8)
+
+context TRL
+inv R9_SincroniaTRLImpacto:
+    -- A partir de TRL 5, el producto debe integrar la descripción de impacto
+    self.nivel > 4 implies 
+    (self.activoReal->notEmpty() and self.contextoImpactoIncluido = true)
+
+context PuntoDecision
+inv R15_Escalado:
+    -- El escalado requiere titularidad de PI y cumplimiento legal bloqueante
+    self.etapaActual = EtapaPSD::ESCALADO_OPERACIONAL implies 
+    (self.equipoEmprendedor.titularidadPI = 'DEFINIDA' and 
+     self.restriccionRegulatoria->forAll(r | r.impacto = 'BLOQUEANTE' implies r.cumplida = true))
+
+-- ============================================================================
+-- 5.3.4. Gobernanza Humana y Validación de Stakeholders
+-- ============================================================================
+
+context PuntoDecision
+inv R13_SoberaniaCTO:
+    -- La IA requiere supervisión humana experta (CTO con experiencia)
+    self.trayectoriaSeleccionada = TipoTrayectoria::TRAYECTORIA_VIBE_CODING implies 
+    self.equipoEmprendedor.miembros->exists(m | m.rol = 'CTO' and m.experienciaPrevia >= 7)
+
+context PuntoDecision
+inv R14_PerfilMiembrosBalanceado:
+    -- El escalado operacional requiere bicefalia estratégica (CEO/CTO)
+    self.etapaActual = EtapaPSD::ESCALADO_OPERACIONAL implies 
+    (self.equipoEmprendedor.miembros->exists(m | m.rol = 'CEO') and 
+     self.equipoEmprendedor.miembros->exists(m | m.rol = 'CTO'))
+
+context PuntoDecision
+inv R7_CertificacionMercadoEImpacto:
+    -- Validación dual: mercado (inversionista) y social (beneficiario)
+    self.etapaActual = EtapaPSD::MERCADO_COMERCIAL implies 
+    (self.crl.validaciones->exists(v | v.interesado.rol = 'Inversionista' and v.metricaClave.valorObtenido >= 0.8) and 
+     self.ipl.validaciones->exists(v | v.interesado.rol = 'Beneficiario' and v.metricaClave.valorObtenido >= 0.7))
+
+context FactoresContexto
+inv R24_CapacidadImpacto:
+    -- Obligatoriedad de un gestor de impacto en proyectos ODS
+    self.esTripleImpacto implies 
+    self.equipoEmprendedor.miembros->exists(m | m.rol = 'IMPACT_MANAGER')
+
+context PuntoDecision
+inv R25_MadurezMinimaEscalado:
+    -- Mínimos de madurez balanceada para operar (TRL>=5, CRL>=4, IPL>=4)
+    self.etapaActual = EtapaPSD::ESCALADO_OPERACIONAL implies 
+    (self.trl.nivel >= 5 and self.crl.nivel >= 4 and self.ipl.nivel >= 4)
+
+-- ============================================================================
+-- 5.3.5. Impacto, ODS y Consistencia Ética
+-- ============================================================================
+
+context PuntoDecision
+inv R10_ReglaOroPivote:
+    -- Si la validación comercial o social falla críticamente, pivote a IDEA
+    self.crl.resultado < 0.4 or self.ipl.resultado < 0.3 implies 
+    self.etapaActual = EtapaPSD::IDEA
+
+context ProyectoEBCT
+inv R17_MetricasImpactoObligatorias:
+    -- Prohíbe declarar impacto sin métricas asociadas
+    self.tipo = TipoEBCT::IMPACTO implies 
+    self.puntoDecision.ipl.metricasImpacto->notEmpty()
+
+context PuntoDecision
+inv R18_VozDelBeneficiario:
+    -- Validación obligatoria de la comunidad para alto impacto (IPL >= 5)
+    self.ipl.nivel >= 5 implies 
+    (self.ipl.validaciones->exists(v | v.interesado.rol = 'Beneficiario') and 
+     self.ipl.verificacionExterna = true)
+
+context ProyectoEBCT
+inv R19_ContribucionODS_Flexible:
+    -- Todo proyecto debe tributar al menos a un ODS (Flexible para Comercial)
+    (self.tipo = TipoEBCT::IMPACTO implies self.factoresContexto.odsPrioritarios->notEmpty()) and 
+    (self.tipo = TipoEBCT::COMERCIAL implies 
+        (self.factoresContexto.odsPrioritarios->notEmpty() or 
+         self.factoresContexto.odsPrioritarios->includes(ODS::ODS_09)))
+
+context FactoresContexto
+inv R20_TeoriaDeCambio:
+    -- Obliga a documentar el mecanismo causal del impacto
+    self.esTripleImpacto implies 
+    self.teoriaCambio->notEmpty()
+
+context PuntoDecision
+inv R21_AlineacionEticaODS:
+    -- La IA verifica si la solución técnica sirve realmente al ODS propuesto
+    self.factoresContexto.esTripleImpacto = true implies 
+    self.auditoriaIA.evaluarAlineacionODS(self.factoresContexto.odsPrioritarios) >= 0.7
+
+context PuntoDecision
+inv R22_ObligatoriedadEtica:
+    -- Certificación de no maleficencia del activo digital
+    self.factoresContexto.esTripleImpacto = true implies 
+    self.auditoriaIA.impactoEticoEvaluado = true
+
+context PuntoDecision
+inv R23_SincroniaImpacto:
+    -- Valida que los ODS seleccionados correspondan al eje de impacto (Ej. Social)
+    self.factoresContexto.ejeImpactoPrincipal = self.ipl.ejeImpacto and 
+    (self.factoresContexto.ejeImpactoPrincipal = EjeImpacto::SOCIAL implies 
+     self.factoresContexto.odsPrioritarios->exists(o | 
+         o = ODS::ODS_01 or o = ODS::ODS_03 or o = ODS::ODS_04 or 
+         o = ODS::ODS_05 or o = ODS::ODS_10))
+
+context MetricaClave
+inv R8_IntegridadDatos:
+    -- Normalización de métricas para comparabilidad sistémica (0 a 100)
+    self.valorObtenido >= 0 and self.valorObtenido <= 100
+
+-- ============================================================================
+-- 5.3.6. Control del Proyecto (Núcleo)
+-- ============================================================================
+
+context ProyectoEBCT
+inv R26_ClasificacionObligatoria:
+    -- Declarar el tipo de proyecto es obligatorio
+    self.tipo = TipoEBCT::COMERCIAL or self.tipo = TipoEBCT::IMPACTO
+
+context ProyectoEBCT
+inv R27_CoherenciaNucleoProyecto:
+    -- La propuesta de valor debe reflejar el problema y el cliente
+    self.factoresContexto.propuestaValor <> '' and 
+    self.factoresContexto.propuestaValor.toLower()->includes(self.problemaCentral.toLower()) and 
+    self.factoresContexto.propuestaValor.toLower()->includes(self.segmentoCliente.toLower())
+
+context ProyectoEBCT
+inv R28_DeclaracionExplicitaImpacto:
+    -- Proyectos de impacto deben declarar beneficiario y ODS
+    self.tipo = TipoEBCT::IMPACTO implies 
+    (self.beneficiarioImpacto <> '' and 
+     self.beneficiarioImpacto.size() > 3 and 
+     self.factoresContexto.odsPrioritarios->notEmpty() and 
+     self.factoresContexto.propuestaValor.toLower()->includes(self.beneficiarioImpacto.toLower()))
+
+context ProyectoEBCT
+inv R29_MinimoIPL_ParaImpacto:
+    -- Nivel 4 IPL requiere beneficiarios estimados > 0
+    self.tipo = TipoEBCT::IMPACTO and 
+    self.puntoDecision.ipl.nivel >= 4 implies 
+    self.puntoDecision.ipl.beneficiariosEstimados > 0
