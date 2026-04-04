@@ -1,0 +1,358 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam classAttributeIconSize 0
+skinparam nodesep 20
+skinparam ranksep 30
+
+package "Metamodelo Integral EBCT-EDA (MIVE v2.0)" {
+
+  ' --- ENUMERACIONES (agrupadas) ---
+  
+  enum ODS {
+      ODS_01  "Fin de la pobreza"
+      ODS_02  "Hambre cero"
+      ODS_03  "Salud y bienestar"
+      ODS_04  "Educación de calidad"
+      ODS_05  "Igualdad de género"
+      ODS_06  "Agua limpia y saneamiento"
+      ODS_07  "Energía asequible y no contaminante"
+      ODS_08  "Trabajo decente y crecimiento económico"
+      ODS_09  "Industria, innovación e infraestructura"
+      ODS_10  "Reducción de las desigualdades"
+      ODS_11  "Ciudades y comunidades sostenibles"
+      ODS_12  "Producción y consumo responsables"
+      ODS_13  "Acción por el clima"
+      ODS_14  "Vida submarina"
+      ODS_15  "Vida de ecosistemas terrestres"
+      ODS_16  "Paz, justicia e instituciones sólidas"
+      ODS_17  "Alianzas para lograr los objetivos"
+    }
+    
+    enum TipoEBCT 
+    { 
+    COMERCIAL
+    IMPACTO 
+    }
+    enum EtapaPSD 
+    { 
+    IDEA
+    MVP_CERO
+    PROTOTIPO_LAB
+    VALIDACION_RELEVANTE
+    ESCALADO_OPERACIONAL
+    MERCADO_COMERCIAL 
+    }
+    enum TipoTrayectoria 
+    { 
+    TRAYECTORIA_LOW_CODE
+    TRAYECTORIA_VIBE_CODING
+    TRAYECTORIA_HIBRIDA 
+    }
+    enum EjeImpacto 
+    { 
+    SOCIAL
+    AMBIENTAL
+    MIXTO
+    TECNOLOGICON_A
+    }
+  
+  
+  ' --- NÚCLEO CENTRAL ---
+  class ProyectoEBCT <<(E,#FFAAAA) Entity>> {
+    + idProyecto: String
+    + nombre: String
+    + fechaCreacion: Date
+    + tipo: TipoEBCT
+    + problemaCentral: String
+    + segmentoCliente: String
+    + beneficiarioImpacto: String
+    + estado: String
+    --
+    + getTRL(): TRL
+    + getCRL(): CRL
+    + getIPL(): IPL
+    + evaluarViableTransferencia(): Boolean
+  }
+  
+  ' --- CLÚSTER 1: GOBIERNO Y MADUREZ ---
+  together {
+    class PuntoDecision <<(C,#ADD1B2) Control>> {
+      + idDecision: String
+      + etapaActual: EtapaPSD
+      --
+      + verificarValidacionManual(evidencia: MVP_Cero): Boolean
+      + validarBrechaTRL_CRL_IPL(trl: TRL, crl: CRL, ipl: IPL): Boolean
+      + solicitarAvanceEDA(factores: FactoresContexto): TipoTrayectoria
+      + ejecutarGobernanza(): Boolean
+    }
+    
+    class TRL extends EstadoMadurez {
+      + entornoPrueba: Enum {LAB, RELEVANTE, OPERACIONAL}
+      + fidelidadPrototipo: Float
+      + esGeneradoPorIA: Boolean
+    }
+    
+    class CRL extends EstadoMadurez {
+      + segmentoCliente: String
+      + hipotesisValidada: Boolean
+      + validacionManualCompletada: Boolean
+      + metricaTraccion: Float
+    }
+    
+    class IPL extends EstadoMadurez {
+      + ejeImpacto: EjeImpacto
+      + odsVinculados: List<ODS>
+      + metricasImpacto: Map<String, Float>
+      + beneficiariosEstimados: Integer
+      + impactoCuantificado: Float
+      + verificacionExterna: Boolean
+    }
+    
+    class MVP_Cero {
+      + tipo: String
+      + evidenciaTraccion: String
+      + recursosManuales: List
+      + costoEjecucion: Float
+      + evidenciasImpacto: List<String>
+      + esAptoParaAutomatizar(): Boolean
+    }
+  }
+  
+  ' --- CLÚSTER 2: INTELIGENCIA Y CONTEXTO ---
+  together {
+    class FactoresContexto {
+      + presupuestoDisponible: Float
+      + tiempoLimite: Duration
+      + / capacidadTecnicaEquipo: Integer
+      + requiereSoberaniaTotal: Boolean
+      + complejidadAlgoritmica: Float
+      + propuestaValor: String
+      + esTripleImpacto: Boolean
+      + ejeImpactoPrincipal: EjeImpacto
+      + odsPrioritarios: List<ODS>
+      + descripcionImpacto: String
+      + teoriaCambio: String
+      --
+      + evaluarMejorRuta(): TipoTrayectoria
+      + sumarCapacidadesEquipo(): Integer
+      + calcularPuntajeImpacto(): Float
+    }
+    
+    class TeoriaCambio {
+      + problemaCentral: String
+      + poblacionObjetivo: String
+      + resultadosEsperados: List<String>
+      + indicadoresImpacto: List<MetricaClave>
+      + supuestosCriticos: List<String>
+    }
+  }
+  
+  ' --- CLÚSTER 3: ESTRUCTURA ORGANIZATIVA ---
+  together {
+    class EquipoEmprendedor {
+      + nombreEquipo: String
+      + fechaConstitucion: Date
+      + cohesionEquipo: Float
+      + compromisoImpacto: Float
+      --
+      + evaluarCapacidadEjecucion(): Float
+      + evaluarCompetenciasImpacto(): Float
+      + calcularPuntajeTotal(): Integer
+    }
+    
+    class Emprendedor <<Founder>> {
+      + perfil: String
+      + capacidadesTecnicas: List
+      + participacionAccionaria: Float
+      + visionImpacto: String
+      --
+      + ejecutarValidacionManual()
+      + definirHipotesis()
+      + solicitarAvance()
+    }
+    
+    class MiembroEquipo {
+      + nombre: String
+      + rol: Enum {CEO, CTO, CMO, COO, SCIENTIST, IMPACT_MANAGER}
+      + dedicacion: Enum {PART_TIME, FULL_TIME}
+      + criterioTecnico: Integer 1..10
+      + experienciaPrevia: Integer
+      + competenciasImpacto: List<String>
+      + nivelCompetenciasImpacto: Integer 1..10
+    }
+  }
+  
+  ' --- CLÚSTER 4: PRODUCTO Y ACELERACIÓN EDA ---
+  together {
+    abstract class MVP_Especializado {
+      + tipo: String
+      + objetivo: String
+      + esProductoReal: Boolean
+      + contribucionODS: List<ODS>
+    }
+    
+    class MVPLowCode extends MVP_Especializado {
+      + plataforma: String
+      + requiereInterfaz: Boolean
+    }
+    
+    class MVPVibeCoding extends MVP_Especializado {
+      + stackTecnico: String
+      + promptPrincipal: String
+      + contextoImpacto: String
+    }
+    
+    class Agente_VibeCoding extends EntornoDesarrolloAcelerado {
+      + modeloIA: String
+      + contextoProyecto: String
+      + promptContextoImpacto: String
+      --
+      + generarCodigoProfesional()
+      + soberaniaCodigo: Boolean
+      + generarCodigoConImpacto(contexto: FactoresContexto): Script
+    }
+    
+    class Entorno_LowCode extends EntornoDesarrolloAcelerado {
+      + plataforma: String
+      + nivelAbstraccion: Integer
+      --
+      + integrarAPI(endpoint: String)
+    }
+    
+    class CodigoFuenteReal {
+      + repositorio: String
+      + lenguaje: String
+      + documentacionImpacto: String
+    }
+    
+    ' --- CLASE SCRIPT CRÍTICA PARA AUDITORÍA ---
+    class Script {
+      + contenido: String
+      + lenguaje: String
+      + esPropiedadEBCT: Boolean
+      + comentariosImpacto: String
+    }
+  }
+  
+  ' --- CLÚSTER 5: ÉTICA, SOBERANÍA Y VALIDACIÓN ---
+  together {
+    class AuditoriaIA {
+      + nivelExplicabilidad: Float
+      + sesgosDetectados: List<String>
+      + certificadoSeguridad: Boolean
+      + impactoEticoEvaluado: Boolean
+      --
+      + verificarSoberania(script: Script): Boolean
+      + evaluarAlineacionODS(script: Script, ods: List<ODS>): Float
+    }
+    
+    class RestriccionRegulatoria {
+      + idNormativa: String
+      + impacto: ImpactoLegal
+      + cumplida: Boolean
+      + relacionODS: List<ODS>
+    }
+    
+    class Interesado {
+      + nombre: String
+      + rol: Enum {Cientifico, Inversionista, Cliente, Regulador, Beneficiario, Comunidad}
+      + tipoInversionista: Enum {TRADICIONAL, IMPACTO, FILANTROPICO}
+    }
+    
+    class Validacion {
+      + fecha: Date
+      + resultado: Float
+      + tipo: Enum {MANUAL_HUMANO, TECNICO, MERCADO, IMPACTO}
+      + dimensionEvaluada: Enum {TRL, CRL, IPL}
+    }
+    
+    class MetricaClave {
+      + nombre: String
+      + valorObjetivo: Float
+      + valorObtenido: Float
+      + tipoMetrica: Enum {TECNICA, COMERCIAL, IMPACTO}
+      + unidadMedida: String
+    }
+  }
+  
+  
+  ' --- RELACIONES CENTRALES DESDE ProyectoEBCT ---
+  ProyectoEBCT "1" *-- "1" EquipoEmprendedor : es liderado por >
+  ProyectoEBCT "1" *-- "1" FactoresContexto : está definido por >
+  ProyectoEBCT "1" *-- "1" PuntoDecision : se gobierna mediante >
+  ProyectoEBCT "1" *-- "0..*" MVP_Especializado : desarrolla >
+  ProyectoEBCT "1" *-- "0..*" Validacion : acumula >
+  
+  ' --- RELACIONES DE GOBIERNO ---
+  PuntoDecision "1" o-- "1" TRL : evalúa >
+  PuntoDecision "1" o-- "1" CRL : evalúa >
+  PuntoDecision "1" o-- "1" IPL : evalúa >
+  PuntoDecision "1" *-- "0..*" RestriccionRegulatoria : considera >
+  PuntoDecision ..> AuditoriaIA : consulta >
+  
+  ' --- RELACIONES DE CONTEXTO ---
+  FactoresContexto "1" -- "0..1" TeoriaCambio : fundamenta >
+  FactoresContexto "1" *-- "0..*" ODS : se alinea con >
+  
+  ' --- RELACIONES DE EQUIPO ---
+  EquipoEmprendedor "1" *-- "1..*" MiembroEquipo : se compone de >
+  Emprendedor --|> MiembroEquipo : es un >
+  
+  ' --- RELACIONES DE PRODUCTO (INCLUYENDO SCRIPT) ---
+  MVPLowCode ..> Entorno_LowCode : <<acelerado_por>>
+  MVPVibeCoding ..> Agente_VibeCoding : <<generado_por>>
+  Agente_VibeCoding "1" *-- "1" CodigoFuenteReal : produce >
+  Agente_VibeCoding "1" o-- "*" Script : genera >
+  
+  ' --- RELACIONES CRÍTICAS DE AUDITORÍA ---
+  AuditoriaIA ..> Script : audita >
+  Script "1" --o "1" CodigoFuenteReal : se materializa en >
+  
+  ' --- RELACIONES DE VALIDACIÓN ---
+  Validacion "1" -- "1" MVP_Especializado : valida >
+  Validacion "1" -- "1..*" Interesado : involucra >
+  Validacion "1" *-- "1..*" MetricaClave : mide >
+  
+  ' --- RELACIONES DE EVIDENCIA ---
+  MVP_Cero "1" --o "1" CRL : provee evidencia a >
+  Emprendedor "1" -- "1..*" MVP_Cero : ejecuta >
+  Emprendedor "1" -- "1" PuntoDecision : solicita validación a >
+  
+  ' --- RELACIONES DE BIFURCACIÓN ---
+  PuntoDecision ..> FactoresContexto : consulta para >
+  PuntoDecision ..> Entorno_LowCode : selecciona si >
+  PuntoDecision ..> Agente_VibeCoding : selecciona si >
+  
+  ' --- NOTAS ESTRATÉGICAS MEJORADAS ---
+  note top of ProyectoEBCT
+    <b>NÚCLEO ARTICULADOR DEL METAMODELO</b>
+    • Discriminador R26: COMERCIAL vs IMPACTO
+    • Activa diferentes conjuntos de reglas OCL
+    • Coordina los 5 clústeres del sistema
+    • Posee las 3 dimensiones de madurez (TRL/CRL/IPL)
+  end note
+  
+  note right of PuntoDecision
+    <b>MOTOR DE GOBERNANZA</b>
+    • Aplica compuertas OCL (R1, R2, R25)
+    • Evalúa brecha tridimensional
+    • Prescribe trayectoria EDA óptima
+  end note
+  
+  note left of FactoresContexto
+    <b>CEREBRO ANALÍTICO</b>
+    • Contextualiza el proyecto
+    • Implementa R3 y R4 (bifurcación)
+    • Vincula con ODS y teoría de cambio
+  end note
+  
+  note bottom of Script
+    <b>ARTEFACTO AUDITADO (R6, R21)</b>
+    • Contiene código generado por IA
+    • Auditado por soberanía y alineación ODS
+    • Comentarios documentan impacto
+  end note
+}
+
+@enduml
