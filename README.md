@@ -74,11 +74,11 @@ Si utilizas este metamodelo en tu investigación, por favor cita de la siguiente
 
 BibTeX
 
-    @misc{mive_metamodel_2024,
+    @misc{mive_metamodel_2026,
       author = {Ospina, Mercy},
       title = {Metamodelo MIVE v2.0: Ontología y Reglas OCL para EBCT-EDA},
       year = {2026},
       publisher = {GitHub / Zenodo},
-      doi = {10.5281/zenodo.XXXXXX},
-      url = {https://github.com/tu_usuario/mive-metamodel-v2}
+      doi = {10.5281/zenodo.19414130},
+      url = {https://github.com/mercyospinaMIVE20/tesis-mive-v2}
     }
