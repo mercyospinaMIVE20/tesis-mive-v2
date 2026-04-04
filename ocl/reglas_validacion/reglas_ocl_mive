@@ -149,11 +149,11 @@ inv R17_MetricasImpactoObligatorias:
     self.puntoDecision.ipl.metricasImpacto->notEmpty()
 
 context PuntoDecision
-inv R18_VozDelBeneficiario:
+inv R18_ValidacionBeneficiarios:
     -- Validación obligatoria de la comunidad para alto impacto (IPL >= 5)
-    self.ipl.nivel >= 5 implies 
-    (self.ipl.validaciones->exists(v | v.interesado.rol = 'Beneficiario') and 
-     self.ipl.verificacionExterna = true)
+   (self.nivel = 4 implies self.beneficiariosEstimados >0) 
+    and
+    (self.nivel >= 5 implies self.validacion->exists(v | v.interesado.rol = #Beneficiario))
 
 context ProyectoEBCT
 inv R19_ContribucionODS_Flexible:
