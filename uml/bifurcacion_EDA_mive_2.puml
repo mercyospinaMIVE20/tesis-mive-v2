@@ -1,0 +1,49 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+top to bottom direction
+
+title <b>Bifurcación EDA - Dos Trayectorias</b>
+
+actor "Emprendedor" as E
+control "PuntoDecision" as P
+entity "FactoresContexto" as F
+
+' --- PRE-EVALUACIÓN ---
+E -> P : "1. solicitarAvance()"
+P -> F : "2. consultarFactores()"
+F --> P : "3. factores"
+
+' --- RUTAS PARALELAS VISUALES ---
+
+rectangle "Trayectoria Low-Code" #E6F3E6 {
+  control "Entorno_LowCode" as L
+  P -> L : "4a. [si R4] activar()"
+  note on link: <b>Condición R4:</b>\npresupuestoDisponible < 100
+  L --> E : "5a. Prototipo rápido\nTRL nivel 3"
+}
+
+rectangle "Trayectoria Vibe-Coding" #E6E6F3 {
+  control "Agente_VibeCoding" as V
+  entity "Equipo" as Eq
+  
+  P -> Eq : "4b. [si R3] verificarCTO()"
+  note on link: <b>Condición R13:</b>\ncriterioTecnico ≥ 7
+  Eq --> P : "✓ CTO competente"
+  
+  P -> V : "5b. activar()"
+  note on link: <b>Condición R3:</b>\ncomplejidad>0.7 OR\n(impacto+soberanía) OR tiempo≤2
+  V --> E : "6b. Producto real\nTRL nivel 6\n✓ R5, R21"
+}
+
+' --- EXCLUSIVIDAD ---
+note bottom of P
+  <b>R12: Exclusividad</b>
+  Solo una trayectoria se activa
+  según evaluación de R3 vs R4
+end note
+
+legend bottom
+<color:green>■ Low-Code (R4): Presupuesto < 100</color> | 
+<color:blue>■ Vibe-Coding (R3): Complejidad/Impacto/Urgencia</color>
+endlegend

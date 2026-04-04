@@ -1,0 +1,112 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome false
+skinparam actorStyle hollow
+top to bottom direction
+
+' --- ACTORES ---
+actor "Founder/CEO" as CEO
+actor "CTO" as CTO
+actor "Impact Manager" as IM
+actor "Científico" as SCI
+actor "Stakeholder\n(Beneficiario/Inversor)" as STK
+actor "Agente IA" as IA <<system>>
+actor "Sistema de Gobernanza\n(PuntoDecision)" as SYS <<system>>
+
+' --- CASOS DE USO EN FLUJO VERTICAL ---
+
+rectangle "**Ciclo MIVE v2.0**" {
+
+  ' --- BLOQUE 1: INICIACIÓN Y CONTEXTO ---
+  package "Fase 1: Iniciación y Contexto" #MistyRose {
+    usecase "UC-01: Declarar Tipo Proyecto\n(COMERCIAL/IMPACTO)" as UC01
+    usecase "UC-02: Definir Contexto, ODS\nTeoría de Cambio" as UC02
+    usecase "UC-03: Validar MVP_Cero\ncon Evidencia de Impacto" as UC03
+    
+    UC01 --> UC02 : <<determina>>\nreglas aplicables
+    UC02 --> UC03 : <<precede>>
+  }
+  
+  ' --- BLOQUE 2: DECISIÓN Y EJECUCIÓN EDA ---
+  package "Fase 2: Decisión y Ejecución EDA" #LightCyan {
+    usecase "UC-04: Solicitar Bifurcación EDA\nbasada en Contexto e Impacto" as UC04
+    
+    UC03 --> UC04 : <<precede>>\n(MVP válido)
+    
+    rectangle "Trayectorias EDA" #White {
+      usecase "UC-05: Desarrollar vía\nLow-Code" as UC05 #LightBlue
+      usecase "UC-06: Desarrollar vía\nVibe-Coding con Contexto Impacto" as UC06 #LightGreen
+    }
+    
+    UC04 --> UC05 : <<extend>>\n(R4: Presupuesto bajo)
+    UC04 --> UC06 : <<extend>>\n(R3: Complejidad/Urgencia)
+  }
+  
+  ' --- BLOQUE 3: INTEGRIDAD Y VALIDACIÓN ---
+  package "Fase 3: Integridad y Validación" #LightYellow {
+    usecase "UC-07: Auditar Soberanía,\nÉtica y Alineación ODS" as UC07
+    usecase "UC-08: Validar Rigor Científico\ny Alineación ODS" as UC08
+    usecase "UC-09: Validar Impacto con\nBeneficiarios/Comunidad" as UC09
+    
+    UC06 --> UC07 : <<include>>
+    UC06 --> UC08 : <<include>>
+    UC05 --> UC09
+    UC06 --> UC09
+  }
+  
+  ' --- BLOQUE 4: GOBERNANZA Y MADUREZ ---
+  package "Fase 4: Gobernanza y Madurez" #LightPink {
+    usecase "UC-10: Certificar Madurez\nTridimensional (TRL/CRL/IPL)" as UC10
+    usecase "UC-11: Gestionar Restricciones\nLegales y Propiedad Intelectual" as UC11
+    
+    UC07 --> UC10
+    UC08 --> UC10
+    UC09 --> UC10
+    UC10 --> UC11 : <<include>>\n(R15: Escalado)
+  }
+}
+
+' --- CONEXIONES PRIMARIAS DE ACTORES ---
+CEO --> UC01
+CEO --> UC02
+CEO --> UC03
+CEO --> UC04
+CEO --> UC11
+
+CTO --> UC02
+CTO --> UC06
+
+IM --> UC02
+IM --> UC09
+
+IA --> UC04
+IA --> UC06
+IA --> UC07
+IA --> UC08
+
+SYS --> UC04
+SYS --> UC07
+SYS --> UC10
+
+SCI --> UC08
+
+STK --> UC03
+STK --> UC09
+STK --> UC10
+
+' --- FLUJOS CONDICIONALES ---
+UC10 --> UC09 : <<include>>\n(R18: Si IPL ≥ 5)
+UC04 --> UC10 : <<include>>\n(para evaluación continua)
+
+' --- LEYENDA DE COLORES ---
+legend right
+  <b>Fases del Ciclo:</b>
+  |<#MistyRose>| Iniciación y Contexto |
+  |<#LightCyan>| Decisión EDA |
+  |<#LightYellow>| Integridad y Validación |
+  |<#LightPink>| Gobernanza y Madurez |
+  <b>Actores Sistema:</b>
+  |<#Black>| Sistema de Gobernanza |
+  |<#LightGray>| Agente IA |
+endlegend
+@enduml

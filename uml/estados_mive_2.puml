@@ -1,0 +1,106 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam state {
+  BackgroundColor<<Impacto>> LightGreen
+  BackgroundColor<<Comercial>> LightBlue
+  BackgroundColor<<Comun>> White
+  FontSize 13
+}
+
+' --- FLUJO PRINCIPAL VERTICAL ---
+state "IDEA" as Idea <<Comun>>
+state "DECLARACIÓN DE TIPO" as Declaracion <<choice>>
+state "MVP_CERO_VALIDADO" as MVPCero <<Comun>>
+state "BIFURCACIÓN EDA" as Bifurcacion <<choice>>
+state "PROTOTIPO_LAB" as PrototipoLab
+state "VALIDACIÓN_RELEVANTE" as ValidacionRelevante
+state "ESCALADO_OPERACIONAL" as Escalado
+state "ESTADOS FINALES" as Finales <<choice>>
+
+' --- FLUJO PRINCIPAL DE ARRIBA HACIA ABAJO ---
+[*] --> Idea
+
+Idea --> Declaracion : "Inicia Proyecto"
+
+state Declaracion {
+  state "PROYECTO\nCOMERCIAL" as TipoComercial <<Comercial>>
+  state "PROYECTO\nIMPACTO" as TipoImpacto <<Impacto>>
+  [*] --> TipoComercial : "Lógica de Mercado"
+  [*] --> TipoImpacto : "Lógica Triple Impacto"
+}
+
+TipoComercial --> MVPCero : "R27: Coherencia\nProblema+Cliente"
+TipoImpacto --> MVPCero : "R28: Beneficiario+ODS\nR29: IPL mínimo futuro"
+
+MVPCero --> Bifurcacion : "R1: Tracción Validada\ny Evidencias Registradas"
+
+state "DESARROLLO ACELERADO (EDA)" as EDA {
+  state "TRAYECTORIA\nLOW-CODE" as LC
+  state "TRAYECTORIA\nVIBE-CODING" as VC
+  
+  Bifurcacion --> LC : "R4: Presupuesto < 100"
+  Bifurcacion --> VC : "R3: Complejidad/Urgencia\nO Impacto+Soberanía"
+  
+  VC --> VC : "Auditoría IA Continua\n(R5, R6, R21, R22)"
+}
+
+Bifurcacion --> EDA
+EDA --> PrototipoLab : "MVP Especializado\nGenerado"
+
+PrototipoLab --> ValidacionRelevante : "R2: Brecha Balanceada\nTRL-CRL-IPL ≤ 2,3,3"
+
+ValidacionRelevante --> Escalado : "R25: TRL≥5, CRL≥4, IPL≥4\nR15: Legal/PI en Orden"
+
+state Finales {
+  state "MERCADO\nCOMERCIAL" as MercadoComercial <<Comercial>>
+  state "IMPACTO\nOPERATIVO" as ImpactoOperativo <<Impacto>>
+  
+  Escalado --> MercadoComercial : "R7: Certificación\nInversionista ≥ 0.8"
+  Escalado --> ImpactoOperativo : "R18: Validación\nBeneficiario ≥ 0.7"
+  
+  MercadoComercial --> [*] : "EBCT Comercial\nConsolidada"
+  ImpactoOperativo --> [*] : "EBCT Impacto\nConsolidada"
+}
+
+' --- RUTAS DE PIVOTAJE (FLUJO DE REGRESIÓN) ---
+Bifurcacion --> Idea : "<<Pivote>>\nCRL < 0.4 o IPL < 0.3 (R10)" 
+EDA --> Idea : "<<Regresión>>\nFalla Validación Técnica"
+ValidacionRelevante --> Idea : "<<Pivote>>\nRechazo Stakeholders (R10)"
+Escalado --> Idea : "<<Regresión Crítica>>\nFalla Legal/PI (R15)"
+
+' --- NOTAS LATERALES PARA CLARIDAD ---
+note right of Declaracion
+  <b>Discriminador Clave (R26):</b>
+  Activa conjuntos diferentes
+  de reglas OCL para toda la
+  trayectoria del proyecto.
+end note
+
+note right of EDA
+  <b>Motor de Desarrollo:</b>
+  • R12: Exclusividad
+  • R13: CTO experiencia ≥7
+    para Vibe-Coding
+  • Auditoría IA automática
+    para código generado
+end note
+
+note right of ValidacionRelevante
+  <b>Compuerta de Gobernanza:</b>
+  • R16a/b: Madurez Comercial/Impacto
+  • Validación dual requerida
+  • Balance tridimensional crítico
+end note
+
+note left of Escalado
+  <b>Punto de no Retorno:</b>
+  • R25: Madurez mínima
+  • R15: Legal/PI definido
+  • Inversión significativa
+  requiere certidumbre
+end note
+
+' --- CONECTORES PARA MEJORAR FLUJO VISUAL ---
+LC --> PrototipoLab
+VC --> PrototipoLab

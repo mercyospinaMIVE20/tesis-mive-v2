@@ -1,0 +1,147 @@
+@startuml
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+top to bottom direction
+skinparam nodesep 15
+skinparam ranksep 20
+
+title <b>Esquema de Interacción MIVE v2.0 (SPEM 2.0)</b>\n<font size=10>Gobernanza Tridimensional con Discriminador de Proyecto</font>
+
+' --- CAPA 0: CONTENEDOR DE PROYECTO (NUEVO) ---
+package "ProyectoEBCT (Contenedor)" <<Entity>> {
+    artifact "Declaración de Tipo\nCOMERCIAL / IMPACTO (R26)" as PROJ
+    note top of PROJ
+        <b>Discriminador Maestro</b>
+        • Activa conjuntos diferenciados de reglas
+        • R27: Coherencia comercial
+        • R28/R29: Exigencias de impacto
+        • Determina validadores obligatorios
+    end note
+}
+
+' --- CAPA 1: ROLES DEL EQUIPO FUNDADOR ---
+package "Roles del Equipo Fundador" <<Framework>> {
+    actor "CEO\n(Founder)" as CEO
+    actor "CTO\n(Socio Técnico)" as CTO
+    actor "Impact Manager\n(Garante de Propósito)" as IM
+}
+
+' --- CAPA 2: ACTIVIDADES DEL PROCESO ---
+package "Actividades del Proceso (ADE)" <<Process>> {
+    usecase "Definir Teoría de Cambio\ny Contexto ODS (R20,R28)" as UC1
+    usecase "Desarrollar vía EDA\n(Low-Code / Vibe-Coding)" as UC2
+    usecase "Auditar Ética, Soberanía\ny Alineación ODS (R21,R22)" as UC3
+}
+
+' --- CAPA 3: PRODUCTOS DE TRABAJO ---
+package "Productos de Trabajo (Artefactos)" <<WorkProduct>> {
+    artifact "MVP_Cero\n(Evidencias de Tracción + Impacto)" as ART1
+    artifact "Código Fuente Soberano\n(Activo Digital Propietario)" as ART2
+    artifact "Reporte de Impacto IPL\n(Métricas y Validación)" as ART3
+}
+
+' --- CAPA 4: NODOS DE VALIDACIÓN ---
+package "Nodos de Validación Externa" <<Stakeholder>> {
+    actor "Inversionista\n(Validador de Mercado)" as INV
+    actor "Científico\n(Validador de Rigor)" as CIEN
+    actor "Beneficiario\n(Validador de Impacto)" as BEN
+}
+
+' --- CAPA 5: GOBERNANZA CENTRAL ---
+control "Punto de Decisión\n(Gobernanza)" as PD <<Gatekeeper>>
+
+' --- RELACIONES DE CONTENEDOR DE PROYECTO (NUEVAS) ---
+PROJ --> CEO : <<asigna>>
+PROJ --> CTO : <<asigna>>
+PROJ --> IM : <<asigna>>
+
+PROJ --> UC1 : <<determina>>\nreglas aplicables
+note on link
+    <b>R27 (COMERCIAL):</b>
+    Coherencia problema+cliente+valor
+    
+    <b>R28 (IMPACTO):</b>
+    + Beneficiario + ODS + 
+    propuestaValor incluye beneficiario
+end note
+
+PROJ --> ART1 : <<requiere>>
+note on link
+    <b>R29:</b> Proyectos IMPACTO
+    deben tener IPL.nivel ≥ 4
+    y beneficiariosEstimados > 0
+end note
+
+' --- FLUJO DE EJECUCIÓN (CREACIÓN) ---
+CEO -down-> UC1 : <<lidera>>
+IM -down-> UC1 : <<co-crea>>
+CTO -down-> UC2 : <<ejecuta>>
+
+' --- DEPENDENCIA ENTRE ACTIVIDADES ---
+UC2 -right-> UC3 : <<incluye>>\nAuditoría IA obligatoria
+
+' --- GENERACIÓN DE ARTEFACTOS ---
+UC1 ..down.> ART1 : <<produce>>
+note on link
+    <b>R1:</b> Evidencia de tracción manual
+    <b>R28:</b> Evidencias de impacto
+    (si proyecto IMPACTO)
+end note
+
+UC2 ..down.> ART2 : <<produce>>
+note on link
+    <b>R5:</b> Código soberano
+    <b>R13:</b> Supervisión CTO (criterio≥7)
+    <b>R3/R4:</b> Según bifurcación
+end note
+
+UC3 ..down.> ART3 : <<produce>>
+note on link
+    <b>R6,R21,R22:</b> Auditoría
+    ética, ODS y explicabilidad
+end note
+
+' --- FLUJO DE VALIDACIÓN TRIDIMENSIONAL ---
+ART1 -right-> INV : "1. Validar tracción comercial"
+note on link
+    <b>R7:</b> Umbral ≥0.8
+    <b>Obligatorio:</b> TODOS los proyectos
+end note
+
+ART2 -right-> CIEN : "2. Validar rigor técnico"
+note on link
+    <b>R6:</b> Código auditado
+    y explicable (≥0.8)
+end note
+
+ART3 -right-> BEN : "3. Validar utilidad social"
+note on link
+    <b>R18:</b> Umbral ≥0.7
+    <b>Condición:</b> Solo proyectos IMPACTO
+    con IPL.nivel ≥ 5
+end note
+
+' --- RETORNO DE VALIDACIÓN AL PUNTO DE DECISIÓN ---
+INV -down-> PD : "Certificado Comercial"
+CIEN -down-> PD : "Certificado Técnico"
+BEN -down-> PD : "Certificado Impacto"
+
+' --- CIERRE DE GOBERNANZA ---
+PD -down-> PD : "Evaluar consenso tridimensional"
+note right of PD
+    <b>Reglas aplicadas por tipo:</b>
+    • R2: Brecha máxima
+    • R16a: Integridad comercial (TODOS)
+    • R16b: Integridad impacto (IMPACTO)
+    • R25: Mínimos de madurez
+    • R15: Legal en orden
+    • R29: IPL mínimo (IMPACTO)
+end note
+
+PD ..down.> (TRL/CRL/IPL) : <<autorizar>>\nActualización sincrónica\n(R25 cumplida)
+
+
+@enduml
