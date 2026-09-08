@@ -1,0 +1,597 @@
+-- ============================================================================
+-- MIVE v2.0 - Perfil ejecutable para USE 6.0
+-- Sintaxis: herencia con '<'; restricciones en bloque 'constraints ... end'
+-- Perfil validador: sin atributos Real, sin llamadas a operaciones en
+-- invariantes, sin operaciones sobre cadenas, sin abs()/xor.
+-- Nota: sin tildes deliberadamente (robustez de codificacion en Windows).
+-- ============================================================================
+
+model MIVE
+
+-- ------------------------------- ENUMERACIONES ------------------------------
+enum TipoEBCT { COMERCIAL, IMPACTO }
+enum EtapaPSD {
+  IDEA, MVPCERO, PROTOTIPOLAB, VALIDACIONRELEVANTE,
+  ESCALADOOPERACIONAL, MERCADOCOMERCIAL
+}
+enum TipoTrayectoria {
+  LOWCODE, VIBECODING, HIBRIDA
+}
+enum EjeImpacto { SOCIAL, AMBIENTAL, MIXTO, TECNOLOGICON_A }
+enum ODSId {
+  ODS01, ODS02, ODS03, ODS04, ODS05, ODS06, ODS07, ODS08, ODS09,
+  ODS10, ODS11, ODS12, ODS13, ODS14, ODS15, ODS16, ODS17
+}
+enum RolMiembro { CEO, CTO, CMO, COO, SCIENTIST, IMPACTMANAGER }
+enum RolInteresado { Cientifico, Inversionista, Cliente, Regulador, Beneficiario, Comunidad }
+enum TipoValidacion { MANUAL_HUMANO, TECNICO, MERCADO, IMPACTO }
+enum DimensionEvaluada { TRL, CRL, IPL }
+enum TitularidadPI { NODEFINIDA, ENPROCESO, DEFINIDA }
+enum ImpactoLegal { BLOQUEANTE, ADVERTENCIA, MITIGABLE }
+
+-- ---------------------------------- CLASES ----------------------------------
+abstract class EstadoMadurez
+attributes
+  nivel : Integer
+end
+
+class TRL < EstadoMadurez
+attributes
+  esGeneradoPorIA : Boolean
+  activoReal : Boolean
+  contextoImpactoIncluido : Boolean
+end
+
+class CRL < EstadoMadurez
+attributes
+  validacionManualCompletada : Boolean
+  metricaTraccion : Integer
+end
+
+class IPL < EstadoMadurez
+attributes
+  ejeImpacto : EjeImpacto
+  beneficiariosEstimados : Integer
+  verificacionExterna : Boolean
+end
+
+class PuntoDecision
+attributes
+  idDecision : String
+  etapaActual : EtapaPSD
+  trayectoriaSeleccionada : TipoTrayectoria
+operations
+  pivotar(motivo : String) : Boolean
+end
+
+class MVP_Cero
+attributes
+  evidenciaTraccion : Boolean
+  costoEjecucion : Integer
+end
+
+class FactoresContexto
+attributes
+  presupuestoDisponible : Integer
+  tiempoLimite : Integer
+  requiereSoberaniaTotal : Boolean
+  complejidadAlgoritmica : Integer
+  propuestaValor : String
+  esTripleImpacto : Boolean
+  ejeImpactoPrincipal : EjeImpacto
+  coherenciaPVProblema : Boolean
+  coherenciaPVSegmento : Boolean
+  coherenciaPVBeneficiario : Boolean
+end
+
+class TeoriaCambio
+attributes
+  problemaCentral : String
+  poblacionObjetivo : String
+end
+
+class EquipoEmprendedor
+attributes
+  nombreEquipo : String
+  titularidadPI : TitularidadPI
+  puntajeCapacidades : Integer
+end
+
+class MiembroEquipo
+attributes
+  nombre : String
+  rol : RolMiembro
+  criterioTecnico : Integer
+  experienciaPrevia : Integer
+end
+
+class Emprendedor < MiembroEquipo
+attributes
+  perfil : String
+end
+
+class ProyectoEBCT
+attributes
+  idProyecto : String
+  nombre : String
+  tipo : TipoEBCT
+  problemaCentral : String
+  segmentoCliente : String
+  beneficiarioImpacto : String
+  beneficiarioDeclarado : Boolean
+end
+
+abstract class EntornoDesarrolloAcelerado
+attributes
+  active : Boolean
+end
+
+class Agente_VibeCoding < EntornoDesarrolloAcelerado
+attributes
+  modeloIA : String
+  esProductoReal : Boolean
+  soberaniaCodigo : Boolean
+end
+
+class Entorno_LowCode < EntornoDesarrolloAcelerado
+attributes
+  plataforma : String
+end
+
+class AuditoriaIA
+attributes
+  nivelExplicabilidad : Integer
+  nivelAlineacionODS : Integer
+  impactoEticoEvaluado : Boolean
+end
+
+class RestriccionRegulatoria
+attributes
+  idNormativa : String
+  impacto : ImpactoLegal
+  cumplida : Boolean
+end
+
+class Interesado
+attributes
+  nombre : String
+  rol : RolInteresado
+end
+
+class Validacion
+attributes
+  tipo : TipoValidacion
+  dimensionEvaluada : DimensionEvaluada
+end
+
+class MetricaClave
+attributes
+  nombre : String
+  valorObjetivo : Integer
+  valorObtenido : Integer
+end
+
+class ODS
+attributes
+  id : ODSId
+end
+
+abstract class MVP_Especializado
+attributes
+  objetivo : String
+end
+
+class MVPLowCode < MVP_Especializado
+attributes
+  plataforma : String
+end
+
+class MVPVibeCoding < MVP_Especializado
+attributes
+  stackTecnico : String
+  contextoImpacto : String
+end
+
+class CodigoFuenteReal
+attributes
+  lenguaje : String
+end
+
+class Script
+attributes
+  esPropiedadEBCT : Boolean
+end
+
+-- ------------------------------- ASOCIACIONES --------------------------------
+association ProyectoEBCT_EquipoEmprendedor between
+  ProyectoEBCT[1] role proyectoLiderado
+  EquipoEmprendedor[1] role equipoEmprendedor
+end
+
+association ProyectoEBCT_FactoresContexto between
+  ProyectoEBCT[1] role proyectoContextual
+  FactoresContexto[1] role factoresContexto
+end
+
+association ProyectoEBCT_PuntoDecision between
+  ProyectoEBCT[1] role proyectoGobernado
+  PuntoDecision[1] role puntoDecision
+end
+
+association ProyectoEBCT_MVPEspecializado between
+  ProyectoEBCT[1] role proyectoDesarrolla
+  MVP_Especializado[0..*] role mvpsDesarrollados
+end
+
+association PuntoDecision_TRL between
+  PuntoDecision[1] role decisionTRL
+  TRL[1] role trl
+end
+
+association PuntoDecision_CRL between
+  PuntoDecision[1] role decisionCRL
+  CRL[1] role crl
+end
+
+association PuntoDecision_IPL between
+  PuntoDecision[1] role decisionIPL
+  IPL[1] role ipl
+end
+
+association PuntoDecision_MVPCero between
+  PuntoDecision[1] role decisionMVP
+  MVP_Cero[1] role mvp_cero
+end
+
+association PuntoDecision_FactoresContexto between
+  PuntoDecision[1] role decisionContexto
+  FactoresContexto[1] role factoresContexto
+end
+
+association PuntoDecision_EquipoEmprendedor between
+  PuntoDecision[1] role decisionEquipo
+  EquipoEmprendedor[1] role equipoEmprendedor
+end
+
+association PuntoDecision_Restricciones between
+  PuntoDecision[1] role decisionRestriccion
+  RestriccionRegulatoria[0..*] role restriccionRegulatoria
+end
+
+association PuntoDecision_AuditoriaIA between
+  PuntoDecision[1] role decisionAuditoria
+  AuditoriaIA[0..1] role auditoriaIA
+end
+
+association PuntoDecision_EntornoLowCode between
+  PuntoDecision[1] role decisionEntorno
+  Entorno_LowCode[0..1] role entornoLowCode
+end
+
+association PuntoDecision_AgenteVibeCoding between
+  PuntoDecision[1] role decisionAgente
+  Agente_VibeCoding[0..1] role agenteVibeCoding
+end
+
+association PuntoDecision_Validacion between
+  PuntoDecision[1] role decisionValidacion
+  Validacion[0..*] role validaciones
+end
+
+association FactoresContexto_TeoriaCambio between
+  FactoresContexto[1] role contextoTeoria
+  TeoriaCambio[0..1] role teoriaCambio
+end
+
+association FactoresContexto_ODS between
+  FactoresContexto[1] role contextoODS
+  ODS[0..*] role odsPrioritarios
+end
+
+association FactoresContexto_EquipoEmprendedor between
+  FactoresContexto[0..*] role contextoEquipo
+  EquipoEmprendedor[1] role equipoEmprendedor
+end
+
+association EquipoEmprendedor_Miembros between
+  EquipoEmprendedor[1] role equipoDeMiembro
+  MiembroEquipo[1..*] role miembros
+end
+
+association IPL_MetricaClave between
+  IPL[1] role iplDeMetrica
+  MetricaClave[0..*] role metricasImpacto
+end
+
+association CRL_Validacion between
+  CRL[0..*] role crlDeValidacion
+  Validacion[0..*] role validaciones
+end
+
+association IPL_Validacion between
+  IPL[0..*] role iplDeValidacion
+  Validacion[0..*] role validaciones
+end
+
+association TRL_AuditoriaIA between
+  TRL[0..1] role trlAuditado
+  AuditoriaIA[0..1] role auditoriaIA
+end
+
+association Validacion_Interesado between
+  Validacion[0..*] role validacionDeInteresado
+  Interesado[1] role interesado
+end
+
+association Validacion_MetricaClave between
+  Validacion[0..*] role validacionDeMetrica
+  MetricaClave[1] role metricaClave
+end
+
+association MVPCero_CRL between
+  MVP_Cero[1] role mvpCero
+  CRL[1] role crl
+end
+
+association ProyectoEBCT_Validacion between
+  ProyectoEBCT[1] role proyectoAcumula
+  Validacion[0..*] role acumulacionValidaciones
+end
+
+association Emprendedor_MVPCero between
+  Emprendedor[0..1] role ejecutor
+  MVP_Cero[0..*] role mvpsEjecutados
+end
+
+association AgenteVibeCoding_CodigoFuenteReal between
+  Agente_VibeCoding[1] role agenteGenerador
+  CodigoFuenteReal[0..1] role codigoFuente
+end
+
+association AgenteVibeCoding_Script between
+  Agente_VibeCoding[1] role agenteDeScript
+  Script[0..*] role scriptsGenerados
+end
+
+association Script_CodigoFuenteReal between
+  Script[0..1] role scriptMaterializado
+  CodigoFuenteReal[0..1] role codigoFuenteDeScript
+end
+
+association MVPLowCode_EntornoLowCode between
+  MVPLowCode[0..*] role mvpAcelerado
+  Entorno_LowCode[0..1] role entornoAcelerador
+end
+
+association MVPVibeCoding_AgenteVibeCoding between
+  MVPVibeCoding[0..*] role mvpGenerado
+  Agente_VibeCoding[0..1] role agenteDeMVP
+end
+
+association Validacion_MVPEspecializado between
+  Validacion[0..*] role validacionDeMVP
+  MVP_Especializado[0..1] role mvpValidado
+end
+
+-- ------------------------------- RESTRICCIONES -------------------------------
+constraints
+
+-- ===== Invariantes de dominio (calibracion; no cuentan como reglas Rn) =====
+context EstadoMadurez
+inv D1_NivelEnRango: self.nivel >= 1 and self.nivel <= 9
+
+context FactoresContexto
+inv D2_PresupuestoNoNegativo: self.presupuestoDisponible >= 0
+inv D3_ComplejidadEnRango: self.complejidadAlgoritmica >= 0 and self.complejidadAlgoritmica <= 10
+inv D4_TiempoLimitePositivo: self.tiempoLimite >= 1
+
+context MiembroEquipo
+inv D5_CriterioTecnicoEnRango: self.criterioTecnico >= 1 and self.criterioTecnico <= 10
+inv D6_ExperienciaNoNegativa: self.experienciaPrevia >= 0
+
+context MetricaClave
+inv D7_ValorObjetivoEnRango: self.valorObjetivo >= 0 and self.valorObjetivo <= 100
+
+context AuditoriaIA
+inv D8_IndicesAuditoriaEnRango:
+  self.nivelExplicabilidad >= 0 and self.nivelExplicabilidad <= 10 and
+  self.nivelAlineacionODS >= 0 and self.nivelAlineacionODS <= 10
+
+context CRL
+inv D9_MetricaTraccionEnRango: self.metricaTraccion >= 0 and self.metricaTraccion <= 100
+
+context IPL
+inv D10_BeneficiariosNoNegativos: self.beneficiariosEstimados >= 0
+
+context MVP_Cero
+inv D11_CostoNoNegativo: self.costoEjecucion >= 0
+
+context EquipoEmprendedor
+inv D12_PuntajeEnRango: self.puntajeCapacidades >= 0 and self.puntajeCapacidades <= 80
+
+-- ================= 5.3.1 Madurez y traccion pre-tecnica =====================
+context PuntoDecision
+inv R1_ValidacionTraccion:
+  self.etapaActual = EtapaPSD::PROTOTIPOLAB implies
+  (self.crl.validacionManualCompletada = true and
+   self.mvp_cero.evidenciaTraccion = true)
+
+context PuntoDecision
+inv R2_VerificarBrecha:
+  (self.trl.nivel - self.crl.nivel <= 2 and self.crl.nivel - self.trl.nivel <= 2) and
+  (self.trl.nivel - self.ipl.nivel <= 3 and self.ipl.nivel - self.trl.nivel <= 3) and
+  (self.crl.nivel - self.ipl.nivel <= 3 and self.ipl.nivel - self.crl.nivel <= 3)
+
+context PuntoDecision
+inv R11_Effectuation:
+  self.mvp_cero.costoEjecucion <= self.factoresContexto.presupuestoDisponible
+
+context CRL
+inv R16a_MadurezComercial:
+  self.nivel >= 5 implies self.metricaTraccion >= 50
+
+context IPL
+inv R16b_MadurezImpacto:
+  self.nivel >= 5 implies
+  (self.metricasImpacto->forAll(m | m.valorObtenido >= m.valorObjetivo))
+
+-- ==================== 5.3.2 Bifurcacion EDA ==================================
+context PuntoDecision
+inv R3_CaminosAceleracion:
+  ((self.factoresContexto.complejidadAlgoritmica > 7 and
+    self.equipoEmprendedor.miembros->exists(m | m.criterioTecnico >= 7)) or
+   (self.factoresContexto.esTripleImpacto = true and
+    self.factoresContexto.requiereSoberaniaTotal = true) or
+   (self.factoresContexto.tiempoLimite <= 2))
+  implies
+  self.trayectoriaSeleccionada = TipoTrayectoria::VIBECODING
+
+context PuntoDecision
+inv R4_TrayectoriaLowCode:
+  (self.factoresContexto.presupuestoDisponible < 100 and
+   not ((self.factoresContexto.complejidadAlgoritmica > 7 and
+         self.equipoEmprendedor.miembros->exists(m | m.criterioTecnico >= 7)) or
+        (self.factoresContexto.esTripleImpacto = true and
+         self.factoresContexto.requiereSoberaniaTotal = true) or
+        (self.factoresContexto.tiempoLimite <= 2)))
+  implies
+  self.trayectoriaSeleccionada = TipoTrayectoria::LOWCODE
+
+context PuntoDecision
+inv R12_ExclusividadTrayectoria:
+  self.entornoLowCode.active = true implies
+  self.agenteVibeCoding.active <> true
+
+-- ============ 5.3.3 Soberania, integridad de IA y validacion legal ==========
+context Agente_VibeCoding
+inv R5_CertificacionSoberania:
+  self.esProductoReal = true implies self.soberaniaCodigo = true
+
+context TRL
+inv R6_ObligatoriedadAuditoria:
+  self.esGeneradoPorIA = true implies
+  (self.auditoriaIA->notEmpty() and
+   self.auditoriaIA.nivelExplicabilidad >= 8)
+
+context TRL
+inv R9_SincroniaTRLImpacto:
+  self.nivel > 4 implies
+  (self.activoReal = true and self.contextoImpactoIncluido = true)
+
+context PuntoDecision
+inv R15_Escalado:
+  self.etapaActual = EtapaPSD::ESCALADOOPERACIONAL implies
+  (self.equipoEmprendedor.titularidadPI = TitularidadPI::DEFINIDA and
+   self.restriccionRegulatoria->forAll(r |
+     r.impacto = ImpactoLegal::BLOQUEANTE implies r.cumplida = true))
+
+-- ========= 5.3.4 Gobernanza humana y validacion de stakeholders =============
+context PuntoDecision
+inv R13_SoberaniaCTO:
+  self.trayectoriaSeleccionada = TipoTrayectoria::VIBECODING implies
+  self.equipoEmprendedor.miembros->exists(m |
+    m.rol = RolMiembro::CTO and m.experienciaPrevia >= 7)
+
+context PuntoDecision
+inv R14_PerfilMiembrosBalanceado:
+  self.etapaActual = EtapaPSD::ESCALADOOPERACIONAL implies
+  (self.equipoEmprendedor.miembros->exists(m | m.rol = RolMiembro::CEO) and
+   self.equipoEmprendedor.miembros->exists(m | m.rol = RolMiembro::CTO))
+
+context PuntoDecision
+inv R7_CertificacionMercadoEImpacto:
+  self.etapaActual = EtapaPSD::MERCADOCOMERCIAL implies
+  (self.crl.validaciones->exists(v |
+     v.interesado.rol = RolInteresado::Inversionista and
+     v.metricaClave.valorObtenido >= 80) and
+   self.ipl.validaciones->exists(v |
+     v.interesado.rol = RolInteresado::Beneficiario and
+     v.metricaClave.valorObtenido >= 70))
+
+context FactoresContexto
+inv R24_CapacidadImpacto:
+  self.esTripleImpacto = true implies
+  self.equipoEmprendedor.miembros->exists(m | m.rol = RolMiembro::IMPACTMANAGER)
+
+context PuntoDecision
+inv R25_MadurezMinimaEscalado:
+  self.etapaActual = EtapaPSD::ESCALADOOPERACIONAL implies
+  (self.trl.nivel >= 5 and self.crl.nivel >= 4 and self.ipl.nivel >= 4)
+
+-- ================== 5.3.5 Impacto, ODS y consistencia etica =================
+context MetricaClave
+inv R8_IntegridadDatos:
+  self.valorObtenido >= 0 and self.valorObtenido <= 100
+
+context ProyectoEBCT
+inv R17_MetricasImpactoObligatorias:
+  self.tipo = TipoEBCT::IMPACTO implies
+  self.puntoDecision.ipl.metricasImpacto->notEmpty()
+
+context PuntoDecision
+inv R18_ValidacionBeneficiariosProgresiva:
+  (self.ipl.nivel = 4 implies self.ipl.beneficiariosEstimados > 0) and
+  (self.ipl.nivel >= 5 implies
+   (self.validaciones->exists(v | v.interesado.rol = RolInteresado::Beneficiario) and
+    self.ipl.verificacionExterna = true))
+
+context ProyectoEBCT
+inv R19_ContribucionODS:
+  (self.tipo = TipoEBCT::IMPACTO implies
+   self.factoresContexto.odsPrioritarios->notEmpty()) and
+  (self.tipo = TipoEBCT::COMERCIAL implies
+   self.factoresContexto.odsPrioritarios->notEmpty())
+
+context FactoresContexto
+inv R20_TeoriaDeCambio:
+  self.esTripleImpacto = true implies self.teoriaCambio->notEmpty()
+
+context PuntoDecision
+inv R21_AlineacionEticaODS:
+  self.factoresContexto.esTripleImpacto = true implies
+  (self.auditoriaIA->notEmpty() and
+   self.auditoriaIA.nivelAlineacionODS >= 7)
+
+context PuntoDecision
+inv R22_ObligatoriedadEtica:
+  self.factoresContexto.esTripleImpacto = true implies
+  (self.auditoriaIA->notEmpty() and
+   self.auditoriaIA.impactoEticoEvaluado = true)
+
+context PuntoDecision
+inv R23_SincroniaImpacto:
+  self.factoresContexto.ejeImpactoPrincipal = self.ipl.ejeImpacto and
+  (self.factoresContexto.ejeImpactoPrincipal = EjeImpacto::SOCIAL implies
+   self.factoresContexto.odsPrioritarios->exists(o |
+     o.id = ODSId::ODS01 or o.id = ODSId::ODS03 or o.id = ODSId::ODS04 or
+     o.id = ODSId::ODS05 or o.id = ODSId::ODS10))
+
+-- ====================== 5.3.6 Control del proyecto ==========================
+context ProyectoEBCT
+inv R26_ClasificacionObligatoria:
+  self.tipo = TipoEBCT::COMERCIAL or self.tipo = TipoEBCT::IMPACTO
+
+context ProyectoEBCT
+inv R27_CoherenciaNucleoProyecto:
+  self.factoresContexto.coherenciaPVProblema = true and
+  self.factoresContexto.coherenciaPVSegmento = true
+
+context ProyectoEBCT
+inv R28_DeclaracionExplicitaImpacto:
+  self.tipo = TipoEBCT::IMPACTO implies
+  (self.beneficiarioDeclarado = true and
+   self.factoresContexto.odsPrioritarios->notEmpty() and
+   self.factoresContexto.coherenciaPVBeneficiario = true)
+
+context ProyectoEBCT
+inv R29_MinimoIPL_ParaImpacto:
+  (self.tipo = TipoEBCT::IMPACTO and
+   self.puntoDecision.ipl.nivel >= 4) implies
+  self.puntoDecision.ipl.beneficiariosEstimados > 0
+
+-- == R10: guarda de TRANSICION (contrato de operacion, no invariante) ========
+context PuntoDecision::pivotar(motivo : String) : Boolean
+pre R10_GuardaPivote:
+  self.crl.nivel < 4 or self.ipl.nivel < 3
+post R10_EstadoPostPivote:
+  self.etapaActual = EtapaPSD::IDEA
