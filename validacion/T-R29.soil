@@ -1,0 +1,130 @@
+-- ============================================
+-- T-R29: Minimo IPL para Impacto (IMPACTO con IPL>=4 sin beneficiarios)
+-- VIOLA: R29_MinimoIPL_ParaImpacto
+-- ============================================
+-- ============================================
+-- CONTEXTO BASE MIVE v2.0
+-- ============================================
+!create proyecto : ProyectoEBCT
+!proyecto.idProyecto := 'PROJ-BASE'
+!proyecto.nombre := 'Proyecto Base'
+!proyecto.tipo := TipoEBCT::COMERCIAL
+!proyecto.problemaCentral := 'Problema'
+!proyecto.segmentoCliente := 'Segmento'
+!proyecto.beneficiarioImpacto := 'N/A'
+!proyecto.beneficiarioDeclarado := false
+
+!create fc : FactoresContexto
+!fc.presupuestoDisponible := 1000
+!fc.tiempoLimite := 5
+!fc.requiereSoberaniaTotal := false
+!fc.complejidadAlgoritmica := 5
+!fc.propuestaValor := 'Propuesta'
+!fc.esTripleImpacto := false
+!fc.ejeImpactoPrincipal := EjeImpacto::MIXTO
+!fc.coherenciaPVProblema := true
+!fc.coherenciaPVSegmento := true
+!fc.coherenciaPVBeneficiario := true
+
+!create equipo : EquipoEmprendedor
+!equipo.nombreEquipo := 'Equipo'
+!equipo.titularidadPI := TitularidadPI::DEFINIDA
+!equipo.puntajeCapacidades := 70
+
+!create miembro1 : MiembroEquipo
+!miembro1.nombre := 'Ana'
+!miembro1.rol := RolMiembro::CEO
+!miembro1.criterioTecnico := 8
+!miembro1.experienciaPrevia := 7
+
+!create miembro2 : MiembroEquipo
+!miembro2.nombre := 'Luis'
+!miembro2.rol := RolMiembro::CTO
+!miembro2.criterioTecnico := 7
+!miembro2.experienciaPrevia := 6
+
+!create ods1 : ODS
+!ods1.id := ODSId::ODS09
+
+!create trl : TRL
+!trl.nivel := 4
+!trl.esGeneradoPorIA := false
+!trl.activoReal := true
+!trl.contextoImpactoIncluido := true
+
+!create crl : CRL
+!crl.nivel := 4
+!crl.metricaTraccion := 60
+!crl.validacionManualCompletada := true
+
+!create ipl : IPL
+!ipl.nivel := 3
+!ipl.beneficiariosEstimados := 100
+!ipl.ejeImpacto := EjeImpacto::MIXTO
+!ipl.verificacionExterna := true
+
+!create mvp : MVP_Cero
+!mvp.costoEjecucion := 500
+!mvp.evidenciaTraccion := true
+
+!create pd : PuntoDecision
+!pd.etapaActual := EtapaPSD::IDEA
+!pd.trayectoriaSeleccionada := TipoTrayectoria::LOWCODE
+!pd.idDecision := 'PD-BASE'
+
+!insert (proyecto, equipo) into ProyectoEBCT_EquipoEmprendedor
+!insert (proyecto, fc) into ProyectoEBCT_FactoresContexto
+!insert (proyecto, pd) into ProyectoEBCT_PuntoDecision
+!insert (pd, trl) into PuntoDecision_TRL
+!insert (pd, crl) into PuntoDecision_CRL
+!insert (pd, ipl) into PuntoDecision_IPL
+!insert (pd, mvp) into PuntoDecision_MVPCero
+!insert (pd, fc) into PuntoDecision_FactoresContexto
+!insert (pd, equipo) into PuntoDecision_EquipoEmprendedor
+!insert (mvp, crl) into MVPCero_CRL
+!insert (fc, ods1) into FactoresContexto_ODS
+!insert (fc, equipo) into FactoresContexto_EquipoEmprendedor
+!insert (equipo, miembro1) into EquipoEmprendedor_Miembros
+!insert (equipo, miembro2) into EquipoEmprendedor_Miembros
+
+-- MODIFICACIONES:
+!proyecto.tipo := TipoEBCT::IMPACTO  -- Activa R29
+!proyecto.beneficiarioDeclarado := true  -- Satisface R28
+!proyecto.beneficiarioImpacto := 'Beneficiarios'
+
+-- ✅ CORRECCIÓN 1: Satisfacer R17 (agregar métrica a IPL)
+!create metrica : MetricaClave
+!metrica.nombre := 'Metrica Impacto'
+!metrica.valorObjetivo := 70
+!metrica.valorObtenido := 80
+
+!insert (ipl, metrica) into IPL_MetricaClave
+
+-- VIOLACIÓN:
+!ipl.nivel := 5  -- Activa R29 (>= 4)
+!ipl.beneficiariosEstimados := 0  -- VIOLA R29 (debe ser > 0)
+
+-- ✅ CORRECCIÓN 2: Satisfacer R18 (IPL=4 exige validación de Beneficiario)
+!create interesado1 : Interesado
+!interesado1.nombre := 'Beneficiario Test'
+!interesado1.rol := RolInteresado::Beneficiario
+
+!create validacion1 : Validacion
+!validacion1.tipo := TipoValidacion::IMPACTO
+!validacion1.dimensionEvaluada := DimensionEvaluada::IPL
+
+!create metrica2 : MetricaClave
+!metrica2.nombre := 'Metrica Validacion'
+!metrica2.valorObjetivo := 70
+!metrica2.valorObtenido := 80
+
+!insert (validacion1, interesado1) into Validacion_Interesado
+!insert (validacion1, metrica2) into Validacion_MetricaClave
+!insert (pd, validacion1) into PuntoDecision_Validacion
+!insert (ipl, validacion1) into IPL_Validacion
+
+-- 2. AGREGAR (multiplicidad metrica2):
+!insert (ipl, metrica2) into IPL_MetricaClave
+
+-- 3. AGREGAR (multiplicidad validacion1):
+!insert (proyecto, validacion1) into ProyectoEBCT_Validacion

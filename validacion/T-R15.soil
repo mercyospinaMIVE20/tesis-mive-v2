@@ -1,0 +1,98 @@
+-- ============================================================
+-- T-R15: Escalado Seguro
+-- Regla: ESCALADOOPERACIONAL implies (titularidadPI=DEFINIDA AND restriccionesBLOQUEANTEcumplidas)
+-- Violacion: ESCALADO con titularidadPI NO definida
+-- Cluster: Gobernanza y Validacion Legal (5.3.3)
+-- ============================================================
+
+-- ============================================
+-- CONTEXTO BASE MIVE v2.0
+-- ============================================
+!create proyecto : ProyectoEBCT
+!proyecto.idProyecto := 'PROJ-BASE'
+!proyecto.nombre := 'Proyecto Base'
+!proyecto.tipo := TipoEBCT::COMERCIAL
+!proyecto.problemaCentral := 'Problema'
+!proyecto.segmentoCliente := 'Segmento'
+!proyecto.beneficiarioImpacto := 'N/A'
+!proyecto.beneficiarioDeclarado := false
+
+!create fc : FactoresContexto
+!fc.presupuestoDisponible := 1000
+!fc.tiempoLimite := 5
+!fc.requiereSoberaniaTotal := false
+!fc.complejidadAlgoritmica := 5
+!fc.propuestaValor := 'Propuesta'
+!fc.esTripleImpacto := false
+!fc.ejeImpactoPrincipal := EjeImpacto::MIXTO
+!fc.coherenciaPVProblema := true
+!fc.coherenciaPVSegmento := true
+!fc.coherenciaPVBeneficiario := true
+
+!create equipo : EquipoEmprendedor
+!equipo.nombreEquipo := 'Equipo'
+!equipo.titularidadPI := TitularidadPI::DEFINIDA
+!equipo.puntajeCapacidades := 70
+
+!create miembro1 : MiembroEquipo
+!miembro1.nombre := 'Ana'
+!miembro1.rol := RolMiembro::CEO
+!miembro1.criterioTecnico := 8
+!miembro1.experienciaPrevia := 7
+
+!create miembro2 : MiembroEquipo
+!miembro2.nombre := 'Luis'
+!miembro2.rol := RolMiembro::CTO
+!miembro2.criterioTecnico := 7
+!miembro2.experienciaPrevia := 6
+
+!create ods1 : ODS
+!ods1.id := ODSId::ODS09
+
+!create trl : TRL
+!trl.nivel := 4
+!trl.esGeneradoPorIA := false
+!trl.activoReal := true
+!trl.contextoImpactoIncluido := true
+
+!create crl : CRL
+!crl.nivel := 4
+!crl.metricaTraccion := 60
+!crl.validacionManualCompletada := true
+
+!create ipl : IPL
+!ipl.nivel := 3
+!ipl.beneficiariosEstimados := 100
+!ipl.ejeImpacto := EjeImpacto::MIXTO
+!ipl.verificacionExterna := true
+
+!create mvp : MVP_Cero
+!mvp.costoEjecucion := 500
+!mvp.evidenciaTraccion := true
+
+!create pd : PuntoDecision
+!pd.etapaActual := EtapaPSD::IDEA
+!pd.trayectoriaSeleccionada := TipoTrayectoria::LOWCODE
+!pd.idDecision := 'PD-BASE'
+
+!insert (proyecto, equipo) into ProyectoEBCT_EquipoEmprendedor
+!insert (proyecto, fc) into ProyectoEBCT_FactoresContexto
+!insert (proyecto, pd) into ProyectoEBCT_PuntoDecision
+!insert (pd, trl) into PuntoDecision_TRL
+!insert (pd, crl) into PuntoDecision_CRL
+!insert (pd, ipl) into PuntoDecision_IPL
+!insert (pd, mvp) into PuntoDecision_MVPCero
+!insert (pd, fc) into PuntoDecision_FactoresContexto
+!insert (pd, equipo) into PuntoDecision_EquipoEmprendedor
+!insert (mvp, crl) into MVPCero_CRL
+!insert (fc, ods1) into FactoresContexto_ODS
+!insert (fc, equipo) into FactoresContexto_EquipoEmprendedor
+!insert (equipo, miembro1) into EquipoEmprendedor_Miembros
+!insert (equipo, miembro2) into EquipoEmprendedor_Miembros
+
+-- MODIFICACIONES:
+!pd.etapaActual := EtapaPSD::ESCALADOOPERACIONAL  -- Activa R15
+!equipo.titularidadPI := TitularidadPI::NODEFINIDA  -- VIOLA
+!trl.nivel := 5
+!crl.nivel := 5
+!ipl.nivel := 4
