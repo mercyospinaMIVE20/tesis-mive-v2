@@ -1,4 +1,4 @@
-Metamodelo MIVE v2.0 - Ontología y Reglas OCL para EBCT-EDA
+Metamodelo MIVE v2.0 - Ontología y Reglas OCL para EBCT-EDA, Validación con USE
 
     Repositorio Oficial de Artefactos Digitales - Tesis Doctoral
     "Ontología y Reglas OCL para el Metamodelo Integral de Validación de Emprendimientos EBCT-EDA (MIVE v2.0)"
