@@ -72,7 +72,7 @@ mive-metamodel-v2/
 
 #### 2.1 Validar con USE (UML-based Specification Environment)
 
-Requisitos: **USE 6.0.0** + plugin **ModelValidator v5.2.0-r1** (Java 8+) + **SWI Prolog**
+Requisitos: **USE 6.0.0** + plugin **ModelValidator v5.2.0-r1** (Java 8+) 
 
 Usar:
 - mive.use, 
@@ -90,7 +90,7 @@ E1 — Consistencia (SATISFIABLE)
 - use> modelvalidator -validate mive.properties
 
 E2 — Independencia lógica (95.1 %)
-- use> modelvalidator -invIndep mive.properties
+- use> modelvalidator -invIndep mive.properties all
 
 E3 — Escenario de escalado (SATISFIABLE)
 - use> open mive.use
