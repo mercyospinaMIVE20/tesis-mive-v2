@@ -1,0 +1,2 @@
+context PuntoDecision
+inv EscenarioEscalado: self.etapaActual = EtapaPSD::ESCALADOOPERACIONAL

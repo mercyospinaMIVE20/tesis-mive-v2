@@ -1,0 +1,5 @@
+-- escenario_coexistencia.ocl
+context PuntoDecision
+inv EscenarioCoexistenciaRoles:
+  self.etapaActual = EtapaPSD::ESCALADOOPERACIONAL and
+  self.factoresContexto.esTripleImpacto = true

@@ -1,0 +1,79 @@
+
+C:\Users\Administrador>use
+USE version 6.0.0, Copyright (C) 1999-2021 University of Bremen
+use> open mive.use
+compiling specification...
+done
+Model MIVE (26 classes, 34 associations, 41 invariants, 1 operation, 2 pre-/postconditions, 0 state machines)
+use> modelvalidator -validate mive_b3.properties
+14:22:45 INFO: No configuration name given. Using first configuration of the file.
+
+14:22:45 INFO: Start model transformation for `MIVE'
+
+14:22:45 INFO: Use `modelvalidator -downloadSolvers' to automatically download and install additional solver libraries.
+
+14:22:46 INFO: Invariant transformation successful
+
+14:22:46 INFO: Model transformation successful
+
+14:22:46 INFO: Translation time (USE to Kodkod): 396 ms
+
+14:22:46 INFO: Model configuration successful
+
+14:22:46 INFO: Searching solution with SatSolver `DefaultSAT4J' and bitwidth 8...
+
+14:22:56 INFO: SATISFIABLE
+
+14:22:56 INFO: Translation time (Kodkod to SAT): 1275 ms; Solving time: 9144 ms
+
+14:22:56 INFO: Create object diagram
+
+use> constraints -load escenario_escalado.ocl
+Added invariants:
+PuntoDecision::EscenarioEscalado
+use> modelvalidator -validate mive_b3.properties
+14:24:06 INFO: No configuration name given. Using first configuration of the file.
+
+14:24:06 INFO: Start model transformation for `MIVE'
+
+14:24:06 INFO: Invariant transformation successful
+
+14:24:06 INFO: Model transformation successful
+
+14:24:06 INFO: Translation time (USE to Kodkod): 31 ms
+
+14:24:06 INFO: Model configuration successful
+
+14:24:06 INFO: Searching solution with SatSolver `DefaultSAT4J' and bitwidth 8...
+
+14:24:18 INFO: SATISFIABLE
+
+14:24:18 INFO: Translation time (Kodkod to SAT): 1111 ms; Solving time: 11741 ms
+
+14:24:18 INFO: Create object diagram
+
+use> constraints -load escenario_coexistencia.ocl
+Added invariants:
+PuntoDecision::EscenarioCoexistenciaRoles
+use> modelvalidator -validate mive_b3.properties
+14:25:14 INFO: No configuration name given. Using first configuration of the file.
+
+14:25:14 INFO: Start model transformation for `MIVE'
+
+14:25:14 INFO: Invariant transformation successful
+
+14:25:14 INFO: Model transformation successful
+
+14:25:14 INFO: Translation time (USE to Kodkod): 29 ms
+
+14:25:14 INFO: Model configuration successful
+
+14:25:14 INFO: Searching solution with SatSolver `DefaultSAT4J' and bitwidth 8...
+
+14:25:27 INFO: SATISFIABLE
+
+14:25:27 INFO: Translation time (Kodkod to SAT): 779 ms; Solving time: 12374 ms
+
+14:25:27 INFO: Create object diagram
+
+use>
