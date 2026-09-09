@@ -41,6 +41,10 @@ mive-metamodel-v2/
     ├── validacion/ 
     │ ├── mive.use
     │ ├── mive.properties
+    │ ├── mive_b3.properties
+    │ ├── escenario_escalado.ocl
+    │ ├── escenario_coexistencia.ocl
+    │ ├── T-R1.soil
     │ └── ...
     └── docs/
       ├── tabla_reglas.md # Tablas 5.6 a 5.11 de la tesis
@@ -68,13 +72,17 @@ mive-metamodel-v2/
 
 #### 2.1 Validar con USE (UML-based Specification Environment)
 
-Requisitos: **USE 6.0.0** + plugin **ModelValidator v5.2.0-r1** (Java 8+) + SWI Prolog
+Requisitos: **USE 6.0.0** + plugin **ModelValidator v5.2.0-r1** (Java 8+) + **SWI Prolog**
 
 Usar:
 - mive.use, 
 - mive.properties, 
 - escenario_escalado.ocl 
 - y la bateria de pruebas de falla T-Ri.soil
+Para límites ampliados
+- mive_b3.properties, 
+- escenario_coexistencia.ocl 
+  
 Pruebas
 
 E1 — Consistencia (SATISFIABLE)
