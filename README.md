@@ -78,22 +78,22 @@ Usar:
 Pruebas
 
 E1 — Consistencia (SATISFIABLE)
-use> open mive.use
-use> modelvalidator -validate mive.properties
+- use> open mive.use
+- use> modelvalidator -validate mive.properties
 
 E2 — Independencia lógica (95.1 %)
-use> modelvalidator -invIndep mive.properties
+- use> modelvalidator -invIndep mive.properties
 
 E3 — Escenario de escalado (SATISFIABLE)
-use> open mive.use
-use> constraints -load escenario_escalado.ocl
-use> modelvalidator -validate mive.properties
+- use> open mive.use
+- use> constraints -load escenario_escalado.ocl
+- use> modelvalidator -validate mive.properties
 
 E4 — Falla (30/30; ejemplo T-R1)
-use> reset
-use> open mive.use
-use> open T-R1.soil
-use> check → 41 invariants, 1 failure (R1)
+- use> reset
+- use> open mive.use
+- use> open T-R1.soil
+- use> check → 41 invariants, 1 failure (R1)
    
 #### 2.2. Evaluar con Eclipse OCL (alternativa *ad-hoc*)
 
