@@ -134,6 +134,10 @@ en USE mediante bounded model finding (SAT), no en Eclipse OCL.*
 | Robustez: E3 con límites ampliados | mive_b3.properties  + escenario_escalado.ocl | SATISFIABLE | 12.9 s |
 | Robustez: coexistencia de roles | mive_b3.properties  + escenario_coexistencia.ocl | SATISFIABLE | 13.2 s |
 
+**Verificación de robustez**. Para descartar que la satisfacibilidad de E1/E3 dependiera de la calibración del espacio de búsqueda, ambos experimentos se repitieron con el límite de instancias de (`-MiembroEquipo) ampliado de 2 a 3 (y el de la (`-asociaciónEquipoEmprendedor_Miembros) a 3 enlaces), manteniendo el resultado. Adicionalmente, el escenario de coexistencia fuerza simultáneamente el escalado operacional y la declaración de triple impacto, con lo cual se activan de forma concurrente R14 (CEO–CTO), R15, R20, R21,R22, R24 (gestor de impacto) y R25: el resultado SATISFIABLE confirma que el régimen admite la coexistencia de los tres roles de gobernanza (`-(CEO, CTO e IMPACTMANAGER)) dentro de un espacio de búsqueda ampliado.
+
+Desglose de tiempos de la verificación de robustez (traducción USE→Kodkod + Kodkod→SAT + resolución SAT):Rob-E1: 396 + 1275 + 9144 ms · Rob-E3: 31 + 1111 + 11741 ms ·Rob-coexistencia: 29 + 779 + 12374 ms. El costo de resolución crece con el espacio ampliado, como es de esperar.
+
 ## ⚠️ Notas técnicas
 
 1. **Literales de enumeración sin guion bajo** (`PROTOTIPOLAB`, no
