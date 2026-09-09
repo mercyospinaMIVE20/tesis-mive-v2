@@ -148,10 +148,6 @@ en USE mediante bounded model finding (SAT), no en Eclipse OCL.*
    34 associations, 41 invariants, 1 operation, 2 pre-/postconditions,
    0 state machines)`.
 
-## 📖 Citación
-
-Si utiliza este metamodelo en su investigación, cite el paquete de
-datos versionado en Zenodo: 
 
 ## 📖 Citación
 
