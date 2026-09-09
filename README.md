@@ -89,11 +89,23 @@ E3 — Escenario de escalado (SATISFIABLE)
 - use> constraints -load escenario_escalado.ocl
 - use> modelvalidator -validate mive.properties
 
+E3 - Con límites ampliados (SATISFIABLE)
+- use> open mive.use
+- use> modelvalidator -validate mive_b3.properties   
+- use> constraints -load escenario_escalado.ocl
+- use> modelvalidator -validate mive_b3.properties
+
 E4 — Falla (30/30; ejemplo T-R1)
 - use> reset
 - use> open mive.use
 - use> open T-R1.soil
 - use> check → 41 invariants, 1 failure (R1)
+
+E5 - Coexistencia de Roles
+- use> open mive.use
+- use> modelvalidator -validate mive_b3.properties   
+- use> constraints -load escenario_coexistencia.ocl
+- use> modelvalidator -validate mive_b3.properties
    
 #### 2.2. Evaluar con Eclipse OCL (alternativa *ad-hoc*)
 
@@ -110,6 +122,9 @@ en USE mediante bounded model finding (SAT), no en Eclipse OCL.*
 | E2: independencia | análisis lógico (`-invIndep`) | 95.1 % (39/41) | ~4 min |
 | E3: escenario de escalado | restricción contextual | SATISFIABLE | 10.0 s |
 | E4: falsificación | batería de 30 casos SOIL | 30/30 exitosos | 0–22 ms/caso |
+| Robustez: E1 con límites ampliados | mive_b3.properties (MiembroEquipo 0–3) | SATISFIABLE | 10.8 s |
+| Robustez: E3 con límites ampliados | mive_b3.properties  + escenario_escalado.ocl | SATISFIABLE | 12.9 s |
+| Robustez: coexistencia de roles | mive_b3.properties  + escenario_coexistencia.ocl | SATISFIABLE | 13.2 s |
 
 ## ⚠️ Notas técnicas
 
