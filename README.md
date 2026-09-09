@@ -37,7 +37,8 @@ mive-metamodel-v2/
     ├── ocl/                         # Reglas formales OCL
     │   
     ├── reglas_ocl_mive.ocll     # todas las reglas OCL 
-    ├── validacion/ # (Recomendado) espejo del paquete Zenodo
+    │  
+    ├── validacion/ 
     │ ├── mive.use
     │ ├── mive.properties
     │ └── ...
