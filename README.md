@@ -99,7 +99,7 @@ E4 — Falla (30/30; ejemplo T-R1)
 
 Importar el modelo UML en Eclipse, cargar los archivos `.ocll` en el
 editor OCL y ejecutar la validación sobre instancias del modelo.
-*Nota: la validación formal reportada en la investigación se realizó
+* Nota: la validación formal reportada en la investigación se realizó
 en USE mediante bounded model finding (SAT), no en Eclipse OCL.*
 
 ## 3. Resultados de la validación formal
