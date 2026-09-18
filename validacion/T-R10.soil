@@ -1,12 +1,12 @@
 -- ============================================
--- T-R10: Guarda de Pivote (Pre/Post)
--- Regla: pre: crl.nivel < 4 OR ipl.nivel < 3
--- Violación: Llamar pivotar() cuando crl.nivel >= 4 AND ipl.nivel >= 3
+-- T-R10.soil
+-- Caso de falsificación para la Regla R10
+-- (Regla de Oro de Equilibrio — contrato de operación pivotar())
 -- ============================================
 
--- ============================================
+-- --------------------------------------------
 -- CONTEXTO BASE MIVE v2.0
--- ============================================
+-- --------------------------------------------
 !create proyecto : ProyectoEBCT
 !proyecto.idProyecto := 'PROJ-BASE'
 !proyecto.nombre := 'Proyecto Base'
@@ -90,7 +90,19 @@
 !insert (equipo, miembro2) into EquipoEmprendedor_Miembros
 
 
--- MODIFICACIONES:
-!crl.nivel := 5  -- VIOLA: pre exige < 4
-!ipl.nivel := 4  -- VIOLA: pre exige < 3
--- Nota: La pre-condicion de pivotar() fallaria
+-- ============================================
+-- VERIFICACION: Bloqueo por R10_GuardaPivote
+-- (falsificacion central del contrato R10)
+-- ============================================
+-- Etapa aplicable => satisface R10_EtapaAplicable
+!pd.etapaActual := EtapaPSD::VALIDACIONRELEVANTE
+-- Guarda violada => CRL >= 4 AND IPL >= 3
+!crl.nivel := 4
+!ipl.nivel := 3
+
+-- INVOCACION (USE debe rechazarla por R10_GuardaPivote):
+!pd.pivotar('fallo de validacion')
+
+-- Si la ejecucion llegara aqui (no deberia), verificar estado:
+?pd.etapaActual
+-- ESPERADO: VALIDACIONRELEVANTE (estado intacto por el rechazo)
