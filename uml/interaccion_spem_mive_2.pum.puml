@@ -1,0 +1,154 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+top to bottom direction
+skinparam nodesep 15
+skinparam ranksep 20
+
+title <b>Esquema de Interacción MIVE v2.0 (SPEM 2.0)</b>\n<font size=10>Gobernanza Tridimensional con Discriminador de Proyecto</font>
+
+' --- CAPA 0: CONTENEDOR DE PROYECTO ---
+package "ProyectoEBCT (Contenedor)" <<Entity>> {
+    artifact "Declaración de Tipo\nCOMERCIAL / IMPACTO (R26)" as PROJ
+    note top of PROJ
+        <b>Discriminador Maestro</b>
+        • Activa conjuntos diferenciados de reglas
+        • R27: Coherencia del núcleo (todo proyecto)
+        • R28/R29: Exigencias de impacto (IMPACTO)
+        • Determina validadores exigibles
+    end note
+}
+
+' --- CAPA 1: ROLES DEL EQUIPO FUNDADOR ---
+package "Roles del Equipo Fundador" <<Framework>> {
+    actor "CEO\n(Founder)" as CEO
+    actor "CTO\n(Socio Técnico)" as CTO
+    actor "Impact Manager\n(Garante de Propósito)" as IM
+    note right of IM
+        <b>R24:</b> exigible cuando el
+        proyecto declara triple impacto
+        (esTripleImpacto), no a todo proyecto
+    end note
+}
+
+' --- CAPA 2: ACTIVIDADES DEL PROCESO ---
+package "Actividades del Proceso (ADE)" <<Process>> {
+    usecase "Definir Teoría de Cambio\ny Contexto ODS (R20, R28)" as UC1
+    usecase "Desarrollar vía EDA\n(Low-Code / Vibe-Coding)" as UC2
+    usecase "Auditar Ética, Soberanía\ny Alineación ODS (R21, R22)" as UC3
+}
+
+' --- CAPA 3: PRODUCTOS DE TRABAJO ---
+package "Productos de Trabajo (Artefactos)" <<WorkProduct>> {
+    artifact "MVP_Cero\n(Evidencias de Tracción + Impacto)" as ART1
+    artifact "Código Fuente Soberano\n(Activo Digital Propietario)" as ART2
+    artifact "Reporte de Impacto IPL\n(Métricas y Validación)" as ART3
+}
+
+' --- CAPA 4: NODOS DE VALIDACIÓN ---
+package "Nodos de Validación Externa" <<Stakeholder>> {
+    actor "Inversionista\n(Certificación de Mercado)" as INV
+    actor "Auditor de IA\n(Control Técnico)" as AUD
+    actor "Beneficiario\n(Certificación de Impacto)" as BEN
+}
+
+' --- CAPA 5: GOBERNANZA CENTRAL ---
+control "Punto de Decisión\n(Gobernanza)" as PD <<Gatekeeper>>
+artifact "TRL / CRL / IPL\n(Madurez Tridimensional)" as MAT
+
+' --- RELACIONES DE CONTENEDOR ---
+PROJ --> CEO : <<asigna>>
+PROJ --> CTO : <<asigna>>
+PROJ --> IM : <<asigna si\ntriple impacto>>
+
+PROJ --> UC1 : <<determina>>\nreglas aplicables
+note on link
+    <b>R27 (todo proyecto):</b>
+    coherencia problema + cliente + valor
+    <b>R28 (IMPACTO):</b>
+    + beneficiario + ODS +
+    coherencia con propuesta de valor
+end note
+
+PROJ --> ART1 : <<requiere>>
+note on link
+    <b>R29:</b> los proyectos de IMPACTO
+    con IPL ≥ 4 deben estimar
+    beneficiarios (> 0)
+end note
+
+' --- FLUJO DE EJECUCIÓN ---
+CEO -down-> UC1 : <<lidera>>
+IM -down-> UC1 : <<co-crea>>
+CTO -down-> UC2 : <<ejecuta>>
+
+' --- DEPENDENCIA ENTRE ACTIVIDADES ---
+UC2 -right-> UC3 : <<incluye>>\nAuditoría IA obligatoria
+
+' --- GENERACIÓN DE ARTEFACTOS ---
+UC1 ..down.> ART1 : <<produce>>
+note on link
+    <b>R1:</b> evidencia de tracción manual
+    <b>R28:</b> evidencias de impacto
+    (si proyecto de IMPACTO)
+end note
+
+UC2 ..down.> ART2 : <<produce>>
+note on link
+    <b>R5:</b> código soberano
+    <b>R13:</b> supervisión de CTO
+    (experiencia ≥ 7)
+    <b>R3/R4:</b> según bifurcación
+end note
+
+UC3 ..down.> ART3 : <<produce>>
+note on link
+    <b>R6, R21, R22:</b> auditoría
+    ética, ODS y explicabilidad
+end note
+
+' --- FLUJO DE VALIDACIÓN TRIDIMENSIONAL ---
+ART1 -right-> INV : "Certificación de mercado"
+note on link
+    <b>R7:</b> exigible en MERCADO_COMERCIAL;
+    validación dual con métrica
+    ≥ 80 (Inversionista) y ≥ 70
+    (Beneficiario) en la escala calibrada
+end note
+
+ART2 -right-> AUD : "Auditoría técnica de IA"
+note on link
+    <b>R6:</b> exigible cuando el TRL es
+    generado por IA: AuditoriaIA con
+    explicabilidad ≥ 8 (escala calibrada);
+    control humano final del resultado
+end note
+
+ART3 -right-> BEN : "Certificación de impacto"
+note on link
+    <b>R18:</b> exigible cuando IPL ≥ 5:
+    validación del Beneficiario y
+    verificación externa
+end note
+
+' --- RETORNO AL PUNTO DE DECISIÓN ---
+INV -down-> PD : "Certificado Comercial"
+AUD -down-> PD : "Certificado Técnico"
+BEN -down-> PD : "Certificado Impacto"
+
+' --- CIERRE DE GOBERNANZA ---
+note right of PD
+    <b>Reglas aplicadas en el cierre:</b>
+    • R2: brecha máxima (todo proyecto)
+    • R16a: integridad comercial (todo proyecto)
+    • R16b: integridad de impacto (todo proyecto con IPL ≥ 5)
+    • R25: mínimos de escalado (5/4/4)
+    • R15: legal y PI en orden (escalado)
+    • R29: beneficiarios estimados (IMPACTO con IPL ≥ 4)
+end note
+
+PD ..down.> MAT : <<autoriza>>\nactualización sincrónica
+
+@enduml

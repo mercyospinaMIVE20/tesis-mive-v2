@@ -1,0 +1,61 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam ranksep 35
+skinparam nodesep 25
+top to bottom direction
+
+title <b>Validación de Valor e Impacto Tridimensional</b>\n<font size=9>Vista de comunicación </font>
+
+' ===== BLOQUE 1: SOLICITUD Y VALIDACIÓN EXTERNA =====
+control "PuntoDecision" as PD <<Control>>
+entity "Validacion" as VAL <<Entity>>
+actor "Interesado\n(Inversionista /\nBeneficiario)" as INT <<Stakeholder>>
+
+PD -down-> VAL : 1. registrar evidencia
+VAL -down-> INT : 2. solicitar validación externa
+INT -up-> VAL : 3. feedback certificado
+
+note right of INT
+  <b>R7</b> (MERCADO_COMERCIAL):
+  dual — Inversionista ≥ 0,80
+  y Beneficiario ≥ 0,70
+  <b>R18</b> (si IPL ≥ 5):
+  Beneficiario + verificación
+  externa — todo proyecto
+end note
+
+' ===== BLOQUE 2: CONTRASTE DE MÉTRICAS =====
+entity "MetricaClave" as MET <<Entity>>
+
+VAL -down-> MET : 4. contrastar (KPIs, ODS)
+MET -up-> PD : 5. resultado integral
+
+note left of MET
+  <b>R16a:</b> CRL ≥ 5 → métricas de 
+  tracción cumplidas
+  <b>R16b:</b> IPL ≥ 5 → métricas
+  de impacto cumplidas
+end note
+
+' ===== BLOQUE 3: ACTUALIZACIÓN Y CIERRE =====
+package "Estado de Madurez" {
+  entity "TRL" as TRL
+  entity "CRL" as CRL
+  entity "IPL" as IPL
+}
+entity "EquipoEmprendedor" as EE <<Organización>>
+
+PD -down-> TRL : 6. actualizar
+PD -down-> CRL : 7. actualizar
+PD -down-> IPL : 8. actualizar
+PD -down-> EE : 9. reporte de desempeño
+
+note right of PD
+  <b>Antes de autorizar:</b>
+  R2: brechas ≤ 2 / ≤ 3 / ≤ 3
+  R25: mínimos 5/4/4 (escalado)
+end note
+
+@enduml
