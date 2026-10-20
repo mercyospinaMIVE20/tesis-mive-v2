@@ -123,6 +123,7 @@ package "Metamodelo Integral EBCT-EDA (MIVE v2.0)" {
   together {
     class FactoresContexto {
       + presupuestoDisponible: Float
+      + presupustoMinimo: Float
       + tiempoLimite: Duration
       + / capacidadTecnicaEquipo: Integer
       + requiereSoberaniaTotal: Boolean
