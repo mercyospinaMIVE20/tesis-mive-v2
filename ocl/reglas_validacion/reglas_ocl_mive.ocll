@@ -7,7 +7,7 @@
  */
 
 -- ============================================================================
--- 5.3.1. Validación de Madurez y Tracción pre-técnica
+-- Validación de Madurez y Tracción pre-técnica
 -- ============================================================================
 
 context PuntoDecision
@@ -33,7 +33,7 @@ context CRL
 inv R16a_MadurezComercial:
     -- Solo hay madurez si se cumple el KPI de tracción
     self.nivel >= 5 implies 
-    self.metricaTraccion >= 0.5 -- Asumiendo umbral genérico si no hay objeto metricaClave directo
+    self.metricaTraccion.valorObtenido >= self.metricaTraccion.valorObjetivo
 
 context IPL
 inv R16b_MadurezImpacto:
@@ -42,13 +42,13 @@ inv R16b_MadurezImpacto:
     (self.metricasImpacto->forAll(m | m.valorObtenido >= m.valorObjetivo))
 
 -- ============================================================================
--- 5.3.2. Bifurcación EDA: Trayectoria Inteligente y Exclusividad
+-- Bifurcación EDA: Trayectoria Inteligente y Exclusividad
 -- ============================================================================
 
 context FactoresContexto
 inv R3_CaminosAceleracion:
     -- Vibe-Coding activado por complejidad, estrategia o urgencia
-    (self.complejidadAlgoritmica > 0.7 and self.equipoEmprendedor.miembros->exists(m | m.criterioTecnico >= 7)) or 
+    (self.complejidadTecnica > 0.7 and self.equipoEmprendedor.miembros->exists(m | m.criterioTecnico >= 7)) or 
     (self.esTripleImpacto = true and self.requiereSoberaniaTotal = true) or 
     (self.tiempoLimite <= 2) 
     implies 
@@ -56,10 +56,13 @@ inv R3_CaminosAceleracion:
 
 context FactoresContexto
 inv R4_TrayectoriaLowCode:
-    -- Obliga a eficiencia extrema en presupuestos mínimos (< 100 unidades)
-    self.presupuestoDisponible < 100 implies 
-    self.evaluarMejorRuta() = TipoTrayectoria::TRAYECTORIA_LOW_CODE
-
+    -- Obliga a eficiencia extrema en presupuestos mínimos 
+    self.presupuestoDisponible < self.presupuestoMinimo 
+    and not ((self.complejidadTecnica > 0.7 and self.equipoEmprendedor.miembros->exists 
+    (m | m.criterioTecnico >= 7)) or (self.esTripleImpacto = true and self.requiereSoberaniaTotal = true) 
+    or (self.tiempoLimite <= 2))) implies 
+    self.trayectoriaSeleccionada = TipoTrayectoria::TRAYECTORIA_LOW_CODEimplies 
+    
 context PuntoDecision
 inv R12_ExclusividadTrayectoria:
     -- Impide la duplicidad de recursos; una trayectoria excluye a la otra
@@ -68,7 +71,7 @@ inv R12_ExclusividadTrayectoria:
     (self.entornoLowCode.active xor self.agenteVibeCoding.active)
 
 -- ============================================================================
--- 5.3.3. Soberanía, Integridad de IA y Validación Legal
+-- Soberanía, Integridad de IA y Validación Legal
 -- ============================================================================
 
 context Agente_VibeCoding
@@ -97,7 +100,7 @@ inv R15_Escalado:
      self.restriccionRegulatoria->forAll(r | r.impacto = 'BLOQUEANTE' implies r.cumplida = true))
 
 -- ============================================================================
--- 5.3.4. Gobernanza Humana y Validación de Stakeholders
+-- Gobernanza Humana y Validación de Stakeholders
 -- ============================================================================
 
 context PuntoDecision
@@ -133,14 +136,8 @@ inv R25_MadurezMinimaEscalado:
     (self.trl.nivel >= 5 and self.crl.nivel >= 4 and self.ipl.nivel >= 4)
 
 -- ============================================================================
--- 5.3.5. Impacto, ODS y Consistencia Ética
+--  Impacto, ODS y Consistencia Ética
 -- ============================================================================
-
-context PuntoDecision
-inv R10_ReglaOroPivote:
-    -- Si la validación comercial o social falla críticamente, pivote a IDEA
-    self.crl.resultado < 0.4 or self.ipl.resultado < 0.3 implies 
-    self.etapaActual = EtapaPSD::IDEA
 
 context ProyectoEBCT
 inv R17_MetricasImpactoObligatorias:
@@ -151,9 +148,10 @@ inv R17_MetricasImpactoObligatorias:
 context PuntoDecision
 inv R18_ValidacionBeneficiarios:
     -- Validación obligatoria de la comunidad para alto impacto (IPL >= 5)
-   (self.nivel = 4 implies self.beneficiariosEstimados >0) 
-    and
-    (self.nivel >= 5 implies self.validacion->exists(v | v.interesado.rol = #Beneficiario))
+       (self.ipl.nivel = 4 implies self.ipl.beneficiariosEstimados > 0) and 
+       (self.ipl.nivel >= 5 implies 
+       (self.validaciones->exists(v | v.interesado.rol = RolInteresado::Beneficiario) and 
+        self.ipl.verificacionExterna = true))
 
 context ProyectoEBCT
 inv R19_ContribucionODS_Flexible:
@@ -196,7 +194,7 @@ inv R8_IntegridadDatos:
     self.valorObtenido >= 0 and self.valorObtenido <= 100
 
 -- ============================================================================
--- 5.3.6. Control del Proyecto (Núcleo)
+-- Control del Proyecto (Núcleo)
 -- ============================================================================
 
 context ProyectoEBCT
@@ -226,3 +224,12 @@ inv R29_MinimoIPL_ParaImpacto:
     self.tipo = TipoEBCT::IMPACTO and 
     self.puntoDecision.ipl.nivel >= 4 implies 
     self.puntoDecision.ipl.beneficiariosEstimados > 0
+
+Nota metodológica sobre R10. A diferencia de las demás reglas del clúster de impacto, R10 no constituye una invariante de estado, sino un contrato de operación que especifica las precondiciones y postcondiciones de la operación pivotar(). Esta distinción es deliberada: el pivote es una transición de estado, no una condición que deba cumplirse en todo momento. Su formalización como contrato permite que el entorno bloquee la ejecución de la operación cuando las precondiciones no se satisfacen, sin generar falsos positivos en etapas tempranas (IDEA, MVP_CERO) donde el CRL e IPL son naturalmente bajos.
+
+Definición de R10:
+pre R10_EtapaAplicable: self.etapaActual = EtapaPSD::VALIDACION_RELEVANTE or 
+self.etapaActual = EtapaPSD::ESCALADO_OPERACIONAL · 
+pre R10_GuardaPivote: self.crl.nivel < 4 or self.ipl.nivel < 3 · 
+post R10_EstadoPostPivote: self.etapaActual = EtapaPSD::IDEA 
+
